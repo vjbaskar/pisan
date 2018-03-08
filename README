@@ -1,0 +1,10 @@
+# A general conf file in 
+~/.$USER/datadump/conf
+
+
+# Depends on
+
+* Rscript
+* BASH
+* BASH -> getopts
+

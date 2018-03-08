@@ -1,0 +1,9 @@
+data..dump	puts
+		gets
+		find
+		list
+
+puts = put data into data dir
+gets = get data from data dir
+find = find and list data from data dir
+list = list the types of expts and data types supported

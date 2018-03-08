@@ -1,0 +1,10 @@
+-t|--title) title of project
+-s|--sampleFile) samplefile.csv
+-i|--id) sanger id or sample id in the samplefile.csv
+-e|--expType) rnaseq or chipseq
+-d|--dataType) genecount,exoncount,tpms,fpkms
+-c|--comments) user comments that can be added to metadata. Only alpha-numerics
+-p|--procs)
+-m|--mem)
+-f|--conf) configuration file
+-h|--help)

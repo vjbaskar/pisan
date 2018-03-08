@@ -1,0 +1,57 @@
+# Script: Merge cram files and convert to bam
+
+# Main config file
+source ~/.$USER/pipeline/conf
+#! $mconf_bashexec
+
+# get the exec dir
+basedir=`readlink -f $0 | xargs dirname`
+source $mconf_installdir/src/general_args.sh
+source $mconf_installdir/src/basic_functions.sh
+if [ $args_return  -gt 0 ]; then
+	echo "
+	++ Mandatory args: title, mem, procs, sampleFile 
+	++ Recommended: mem <=1000, proc=1
+	"
+	exit 2
+fi
+source $conf
+
+$mconf_installdir/bin/pipe..createProject -s $sampleFile -c SAMPLEID,SAMPLENAME | sed -e '1d' >| samples.mergecram.txt
+namefile="samples.mergecram.txt"
+
+
+commandfile="$title.mergecram.commands"
+
+echo -n "" >| $commandfile
+while read line
+	do
+	l=($line)
+	sampleID=${l[0]}
+	sampleName=${l[1]}
+	infosms "Merging CRAM files from $sampleID to $sampleName"
+
+
+	ls $sampleID/finalfiles/*.cram >| ${sampleID}.tomerge.txt
+	c=`cat ${sampleID}.tomerge.txt | wc -l`
+	if [ "$c" -lt 1 ]; then
+		errorsms "Error: No files found to merge"
+		#exit 0
+	fi
+
+	if [ "$c" -eq 1 ]; then
+		infosms "Found only one file. No merging required"
+		file=`cat ${sampleID}.tomerge.txt`
+		cp $file $sampleName.cram
+		#exit 0
+	fi
+
+	if [ "$c" -gt 1 ]; then
+		command="samtools merge -f -c -p -@ ${procs} -b ${sampleID}.tomerge.txt -O BAM  $sampleName.bam"
+		echo $command >> $commandfile
+	fi
+
+done < $namefile
+
+cjobs=`cat $namefile.commands | wc -l`
+farm..sub -q normal -n mergecram -s ${title} -m $mem -p $procs -t 20  -a $commandfile
