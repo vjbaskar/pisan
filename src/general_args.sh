@@ -8,16 +8,22 @@
 # m = mem
 # t = title
 # q = queue
+# f = conf
+# o = organism
+# r = paired, 
+# v = qval
+# u = inputFile
+# y = chrType
 
 
-source ~/.$USER/pipeline/conf
+source ~/.$USER/pisan.conf
 args_return=0
 print_help() {
 	cat $mconf_installdir/cfgs/args
 	args_return=2
 }
 
-if [ $# -eq 0 ]; then
+if [ $# -le 1 ]; then
 	print_help
 fi
 
@@ -25,7 +31,7 @@ fi
 #set -o errexit -o noclobber -o nounset -o pipefail
 set -o errexit -o pipefail
 
-params="$(getopt -o s:i:e:d:c:p:m:f:t:q:h -l sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,conf:,title:,queue:,help --name "$0" -- "$@")"
+params="$(getopt -o s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:h -l sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,conf:,title:,queue:,organism:,paired:,qval:,inputFile:,chrType:,help --name "$0" -- "$@")"
 eval set -- "$params"
 
 # --sampleFile samplefile.csv --id 3900STDY1234 --expType rnaseq --dataType genecounts --comments "Run by Vijay with DESeq2"
@@ -71,6 +77,26 @@ do
 		;;
 		-f|--conf)
 			conf=$2
+			shift 2
+		;;
+		-o|--organism)
+			organism=$2
+			shift 2
+		;;
+		-r|--paired)
+			paired=$2
+			shift 2
+		;;
+		-v|--qval)
+			qval=$2
+			shift 2
+		;;
+		-u|--inputFile)
+			inputFile=$2
+			shift 2
+		;;
+		-y|--chrType)
+			chrType=$2
 			shift 2
 		;;
 		--)

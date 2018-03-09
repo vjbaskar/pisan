@@ -20,6 +20,13 @@ errorsms(){
 	echo "[ Error ] $messaging" > /dev/stderr
 	exit 1
 }
+print_stderr(){
+	RED='\033[0;31m'
+	NC='\033[0m' # No Color
+	messaging=$1
+	echo -e "${RED} $messaging ${NC}" > /dev/stderr
+	exit 1
+}
 
 export -f infosms
 export -f sms

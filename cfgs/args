@@ -1,3 +1,6 @@
+Options available:
+-----------------
+
 -t|--title) title of project
 -s|--sampleFile) samplefile.csv
 -i|--id) sanger id or sample id in the samplefile.csv
@@ -7,4 +10,12 @@
 -p|--procs)
 -m|--mem)
 -f|--conf) configuration file
--h|--help)
+-q|--queue) queue type [normal,small,long,basement,yesterday]
+-o|--organism) command specific option. read below
+-r|--paired) paired reads or not [0,1]
+-v|--qval) pvalue or q value cut off [0-1]
+-u|--inputFile) command specific option. Input files for certain commands
+-y|--chrType) chromosome type [ucsc,ensembl]
+-h|--help) HELP file
+
+

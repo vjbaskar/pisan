@@ -1,7 +1,7 @@
 # Script: Merge cram files and convert to bam
 
 # Main config file
-source ~/.$USER/pipeline/conf
+source ~/.$USER/pisan.conf
 #! $mconf_bashexec
 
 # get the exec dir

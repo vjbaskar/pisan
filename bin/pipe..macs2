@@ -28,3 +28,27 @@ print_stderr "
 "
 	exit 2
 fi
+
+# Conda env installation of macs2
+source activate p27
+
+cmds="$title.macs.cmds"
+rm -f $cmds
+while read line
+	do
+	l=($line)
+	bamfile=${l[0]}
+	controlfile=${l[1]}
+	if [ $paired -eq 1 ]; then
+		fileFormat="BAMPE"
+	else
+		fileFormat="BAM"
+	fi
+	b=`basename $bamfile .bam` 
+	b=`echo "${b}_macs_$qval"`
+	macs="macs2 callpeak -t $bamfile -c $controlfile -f $fileFormat -g $organism -n $b -q $qval -B --SPMR"
+	echo $macs >> $cmds
+done < $inputFile
+
+farm..sub -q $queue -n macs2 -s $title -m $mem -p $procs -t 20 -a $cmds
+#farm..sub -q $queue macs2 -m $mem -p $procs $b "$macs"

@@ -9,22 +9,27 @@ source ~/.$USER/pisan.conf
 source $mconf_installdir/src/general_args.sh
 source $mconf_installdir/src/basic_functions.sh
 
+#echo $args_return
 if [ ! -z "$conf" ]; then
 	source $conf # config file in the local directory can override the default ones
 fi
 
-
-if [ $args_return  -gt 0 ]; then
-print_stderr "
-	++ Mandatory args: organism, paired, qval, inputFile, mem, procs
-	++ recommended: mem=10000   procs=1
-	
-	organism options: hs,mm
-
-	***** inputFile format
-	bamfile1.bam control1.bam
-	bamfile2.bam control1.bam
-
+if [ $# -eq 0 ]; then
+echo "
+Commands available:
+------------------
+star
+bedGraphToBigWig
 "
-	exit 2
+fi
+
+
+if [ $# -eq 1 ]; then
+	if [ "$1" = "star" ]; then
+		source $mconf_installdir/bin/star.sh
+	fi
+	if [ "$1" = "bedGraphToBigWig" ]; then
+		source $mconf_installdir/bin/bedGraphToBigWig.sh
+	fi
+
 fi
