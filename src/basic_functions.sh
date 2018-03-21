@@ -28,6 +28,20 @@ print_stderr(){
 	exit 1
 }
 
+mandatory(){
+	mandatory_check=0
+	while [ $# -gt 0 ]; 
+	do
+		x=$1
+
+		if [ ! -z ${!x} ]; then
+			echo $x			
+		fi
+		shift
+	done
+}
+
+
 export -f infosms
 export -f sms
 export -f warnsms

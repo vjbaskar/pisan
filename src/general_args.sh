@@ -31,7 +31,7 @@ fi
 #set -o errexit -o noclobber -o nounset -o pipefail
 set -o errexit -o pipefail
 
-params="$(getopt -o s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:h -l sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,conf:,title:,queue:,organism:,paired:,qval:,inputFile:,chrType:,help --name "$0" -- "$@")"
+params="$(getopt -o s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:g:0:1:2:3:4:5:h -l sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,conf:,title:,queue:,organism:,paired:,qval:,inputFile:,chrType:,gtf:,file0:,file1:,file2:,file3:,file4:,file5:,help --name "$0" -- "$@")"
 eval set -- "$params"
 
 # --sampleFile samplefile.csv --id 3900STDY1234 --expType rnaseq --dataType genecounts --comments "Run by Vijay with DESeq2"
@@ -97,6 +97,34 @@ do
 		;;
 		-y|--chrType)
 			chrType=$2
+			shift 2
+		;;
+		-g|--gtf)
+			gtf=$2
+			shift 2
+		;;
+		-0|--file0)
+			file0=$2
+			shift 2
+		;;
+		-1|--file1)
+			file1=$2
+			shift 2
+		;;
+		-2|--file2)
+			file2=$2
+			shift 2
+		;;
+		-3|--file3)
+			file3=$2
+			shift 2
+		;;
+		-4|--file4)
+			file4=$2
+			shift 2
+		;;
+		-5|--file5)
+			file5=$2
 			shift 2
 		;;
 		--)

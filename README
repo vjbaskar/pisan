@@ -1,6 +1,12 @@
 ## A general conf file in 
 
-~/.$USER/pisan.conf
+The main config file is ~/.$USER/pisan.conf
+If you provide a conf file with the commands it will overwrite options of pisan.conf
+
+## Main command
+
+pisan -h
+
 
 
 # Depends on
@@ -8,4 +14,11 @@
 * Rscript
 * BASH
 * BASH -> getopts
+* UCSC utilities
+* samtools
+* macs2
+* bwa
+* star
+* Any relevant bio tools should be added to $PATH
+
 

@@ -1,0 +1,12 @@
+commands available:
+------------------
+
+Align: star
+conversions: bedGraphToBigWig
+irods: irodsDownload
+rna-seq: countTableSTAR deseq
+chip-seq: macs2
+tracks: ucsccreatehub
+
+* = untested
+

@@ -4,32 +4,54 @@
 source ~/.$USER/pisan.conf
 #! $mconf_bashexec
 
-# get the exec dir
-# basedir=`readlink -f $0 | xargs dirname`
-source $mconf_installdir/src/general_args.sh
-source $mconf_installdir/src/basic_functions.sh
-
 #echo $args_return
 if [ ! -z "$conf" ]; then
 	source $conf # config file in the local directory can override the default ones
 fi
 
-if [ $# -eq 0 ]; then
-echo "
-Commands available:
-------------------
-star
-bedGraphToBigWig
-"
+# export variables
+set -a # exports the variables as environment variables --> Useful for R scripts
+source $mconf_installdir/src/general_args.sh
+source $mconf_installdir/src/basic_functions.sh
+set +a # switch it back off
+
+pisan_help() 
+{
+cat $mconf_installdir/cfgs/commands
+exit 2
+}
+
+
+
+if [ $# -eq 0 ] ; then
+	pisan_help
 fi
 
+case "$1" in
+	
+    "star" )
+	        source $mconf_installdir/bin/star.sh ;;
+	"bedGraphToBigWig" )
+			source $mconf_installdir/bin/bedGraphToBigWig.sh ;;
+	
+# RNASeq
+	"countTableSTAR" )
+			source $mconf_installdir/bin/countTableSTAR.sh ;;
+	"deseq2" )
+			$mconf_Rscript $mconf_installdir/bin/deseq2.R ;;
+	
+# Downloads
+	"irodsDownload" )
+			source $mconf_installdir/bin/irodsDownload.sh ;;
+# Chipseq	
+	"macs2" )
+			source $mconf_installdir/bin/macs2.sh ;;
+# Visualisation
+	"ucscCreateHub" )
+			source $mconf_installdir/bin/ucscCreateHub.sh ;;
+	"test" )
+			source $mconf_installdir/bin/test.sh ;;
+	"testR" )
+			$mconf_Rscript $mconf_installdir/bin/test.R ;;
+esac
 
-if [ $# -eq 1 ]; then
-	if [ "$1" = "star" ]; then
-		source $mconf_installdir/bin/star.sh
-	fi
-	if [ "$1" = "bedGraphToBigWig" ]; then
-		source $mconf_installdir/bin/bedGraphToBigWig.sh
-	fi
-
-fi

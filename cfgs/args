@@ -1,21 +1,28 @@
 Options available:
 -----------------
+**** - mandatory args
 
--t|--title) title of project
+-t|--title) title of project****
 -s|--sampleFile) samplefile.csv
 -i|--id) sanger id or sample id in the samplefile.csv
 -e|--expType) rnaseq or chipseq
 -d|--dataType) genecount,exoncount,tpms,fpkms
 -c|--comments) user comments that can be added to metadata. Only alpha-numerics
--p|--procs)
--m|--mem)
+-p|--procs) total processors (threads)
+-m|--mem) total memory in MB
 -f|--conf) configuration file
 -q|--queue) queue type [normal,small,long,basement,yesterday]
 -o|--organism) command specific option. read below
+-g|--gtf) gtf file
 -r|--paired) paired reads or not [0,1]
 -v|--qval) pvalue or q value cut off [0-1]
 -u|--inputFile) command specific option. Input files for certain commands
 -y|--chrType) chromosome type [ucsc,ensembl]
--h|--help) HELP file
 
+-0|--file0) optional file0 reserved for specific commands
+-1|--file1) optional file0 reserved for specific commands
+-2|--file2) optional file0 reserved for specific commands
+-3|--file3) optional file0 reserved for specific commands
+-4|--file4) optional file0 reserved for specific commands
+-5|--file5) optional file0 reserved for specific commands
 

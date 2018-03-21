@@ -4,7 +4,7 @@ if [ $args_return -gt 0 ]; then
 	print_stderr "
 	BigWig file for chipseq from bedgraph file
 	
-	++ Mandatory args: procs mem organism inputFile
+	++ Mandatory args: procs mem organism inputFile chrType
 	++ recommended: mem=20000   procs=1
 
 	==== bedGraphFile.txt
