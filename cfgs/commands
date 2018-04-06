@@ -4,9 +4,10 @@ commands available:
 Align: star
 conversions: bedGraphToBigWig
 irods: irodsDownload
-rna-seq: countTableSTAR deseq
+rna-seq: countTableSTAR deseq countTableToTPM
 chip-seq: macs2
 tracks: ucsccreatehub
+farm: farmsub
 
 * = untested
 

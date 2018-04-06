@@ -2,7 +2,9 @@ Options available:
 -----------------
 **** - mandatory args
 
--t|--title) title of project****
+-t|--title) title of project
+
+
 -s|--sampleFile) samplefile.csv
 -i|--id) sanger id or sample id in the samplefile.csv
 -e|--expType) rnaseq or chipseq
@@ -19,6 +21,18 @@ Options available:
 -u|--inputFile) command specific option. Input files for certain commands
 -y|--chrType) chromosome type [ucsc,ensembl]
 
+
+**** Farm specific options
+-x|--command) Command to be run. Used by farmsub.
+-a|--array) [file of commands]. - Runs each line in the file 
+-W|--walltime) [walltime, hh:mm] - Set a timed job
+-T|--concurrent) [total number of concurrent array jobs] - if -a is specified you this to set number of jobs. 
+-j|--waitForJob) [job_name] - Job name to wait.
+-w|--wait) no args. Wait for the job to finish
+-c|--comments) sample ids or names to be added
+the bsub scripts will have title.comments.bsub file names
+
+**** - program specific args. 
 -0|--file0) optional file0 reserved for specific commands
 -1|--file1) optional file0 reserved for specific commands
 -2|--file2) optional file0 reserved for specific commands

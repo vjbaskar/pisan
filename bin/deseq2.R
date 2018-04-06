@@ -4,12 +4,25 @@ library(getopt)
 
 args_return=Sys.getenv("args_return")
 if(args_return > 0){
-    message("Help: 
-		title: 
-		gtfFile: gtf file using which the count table was generated
-		inputFile: count table
-		sampleFile: file containing <name> <condn> <library type>
-		
+    message("
+* Required Args:
+
+title: 
+gtfFile: gtf file using which the count table was generated
+inputFile: count table
+sampleFile: file containing <name> <condn> <library type>
+file0: file containing comparisons
+
+SampleFile:  <name> <condn> <library type>
+BCOR_shRNA1.star.ReadsPerGene.out.tab	BCOR_shRNA1	BCOR_shRNA	paired-end
+BCOR_shRNA2.star.ReadsPerGene.out.tab	BCOR_shRNA2	BCOR_shRNA	paired-end
+Control_shRNA1.star.ReadsPerGene.out.tab	Control_shRNA1	Control	paired-end
+Control_shRNA2.star.ReadsPerGene.out.tab	Control_shRNA2	Control	paired-end
+Note: <name> will not be used in this case.
+
+file0: comparisons.txt
+Control BCOR_shRNA
+
 		")
     quit(status = 2)
 }
@@ -19,12 +32,14 @@ message(title)
 gtfFile=Sys.getenv("gtf")
 countTable=Sys.getenv("inputFile")
 sampleMatrix = Sys.getenv("sampleFile")
+comparisonsFile = Sys.getenv("file0")
 
 message("Loading libraries")
 suppressMessages({
     library(DESeq2)
     library(rtracklayer)
     library(GenomicFeatures)
+    library(WriteXLS)
     # library("preprocessCore")
     # library(ggplot2)
     # library(ggthemes)
@@ -72,42 +87,26 @@ counttable = genes.table
 "--> Filter out genes that you can not obtain exon size information"
 counttable <- counttable [ genesToConsider, ]
 dim(counttable)
-" Read in GTF file "
-txdb <- makeTxDbFromGFF(gtfFile, format = "gtf", circ_seqs = character())
-ebg <- exonsBy(txdb, by="gene")
-genesToConsider <- names(ebg)
+# " Read in GTF file "
+# txdb <- makeTxDbFromGFF(gtfFile, format = "gtf", circ_seqs = character())
+# ebg <- exonsBy(txdb, by="gene")
+# genesToConsider <- names(ebg)
+# 
 
 
-
-
-
-res.filt <- function(res.data, fc, p.adj, annot_data, fpkmMatrix) {
-    temp = as.data.frame(subset(res.data, abs(log2FoldChange) >= fc & padj <= p.adj ))
-    x = rownames(temp)
-    x = cbind(x, temp)
-    colnames(x) = c("gene", colnames(temp))
-    x = as.data.frame(x)
-    x = merge(annot_data, x, by.x = "gene_id",by.y="gene", all.y = T)
-    fpkmMatrix <- fpkmMatrix[, ! grepl("gene_name", colnames(fpkmMatrix)) ]
-    x = merge(x, fpkmMatrix, by="gene_id", all.x=T)
-    x = x [ order(x$log2FoldChange, x$padj), ]
-    return(x)
+plot.volcano <- function(res, lfc, pval){
+    tab = data.frame(logFC = res$log2FoldChange, negLogPval = -log10(res$pvalue))
+    head(tab)
+    par(mar = c(5, 4, 4, 4))
+    plot(tab, pch = 16, cex = 0.6, xlab = expression(log[2]~fold~change), ylab = expression(-log[10]~pvalue))
+    signGenes = (abs(tab$logFC) > lfc & tab$negLogPval > -log10(pval))
+    points(tab[signGenes, ], pch = 16, cex = 0.8, col = "red")
+    abline(h = -log10(pval), col = "green3", lty = 2)
+    abline(v = c(-lfc, lfc), col = "blue", lty = 2)
+    mtext(paste("pval =", pval), side = 4, at = -log10(pval), cex = 0.8, line = 0.5, las = 1)
+    mtext(c(paste("-", lfc, "fold"), paste("+", lfc, "fold")), side = 3, at = c(-lfc, lfc), cex = 0.8, line = 0.5)
 }
 
-res.lfcThreshold <- function(dds, fc, p.adj, annot_data, fpkmMatrix) {
-    res.data <- results(dds, lfcThreshold = fc, alpha = p.adj, format = "DataFrame")
-    temp = as.data.frame(res.data)
-    temp <- subset(temp, (abs(log2FoldChange) >= fc & padj <= p.adj))
-    x = rownames(temp)
-    x = cbind(x, temp)
-    colnames(x) = c("gene", colnames(temp))
-    x = as.data.frame(x)
-    x = merge(annot_data, x, by.x = "gene_id",by.y="gene", all.y = T)
-    fpkmMatrix <- fpkmMatrix[, ! grepl("gene_name", colnames(fpkmMatrix)) ]
-    x = merge(x, fpkmMatrix, by="gene_id", all.x=T)
-    x = x [ order(x$log2FoldChange, x$padj), ]
-    return(x)
-}
 
 medianNormCounts <- function(dds, colData){
     normCounts = counts(dds, normalize = T)
@@ -123,7 +122,7 @@ medianNormCounts <- function(dds, colData){
     return(countMatrix)
 }
 
-getDESeq2 <- function(counttable, sample.matrix, c1, c2){
+getDESeq2 <- function(counttable, sample.matrix, annot_data, c1, c2){
     
     " Extract data corresponding to the conditions"
     colData = subset(sample.matrix, condition %in% c(c1,c2))
@@ -132,13 +131,13 @@ getDESeq2 <- function(counttable, sample.matrix, c1, c2){
     
     " Filter count data for low count data, reads/gene > 0"
     countdata <- counttable
-    message(rownames(colData))
+   # message(rownames(colData))
     countdata = as.matrix(countdata [ , rownames(colData)])
    
     rmax = apply(countdata, 1, max)
-    message("[ Info ] Total genes = ", nrow(countdata))
+   # message("[ Info ] Total genes = ", nrow(countdata))
     countdata = countdata [ rmax >= 1, ]
-    message("[ Info ] Genes with reads = ", nrow(countdata))
+#    message("[ Info ] Genes with reads = ", nrow(countdata))
     
     
     " -- Check if the row order in contrast and columns in count data are in the same order"
@@ -156,61 +155,90 @@ getDESeq2 <- function(counttable, sample.matrix, c1, c2){
     condition = relevel(condition, ref = c1)
     dds <- DESeqDataSetFromMatrix(countData = countdata, colData = colData, design = ~ condition)
     #dds$condition <- factor(dds$condition, levels=c(c1,c2))
-    print(condition)
+   # print(condition)
     
     " Perform DESeq "
     dds <- DESeq(dds)
     res <- results(dds, alpha=0.05, format = "DataFrame")
-    head(res)
     medCounts = medianNormCounts(dds, colData)
-    outpt = merge(res, medCounts, by = "row.names")
-    #summary(res)
+    outpt = merge(medCounts, res,  by = "row.names")
+    outpt = merge(annot_data, outpt, by.y = "Row.names", by.x = "gene_id")
+    # summary(res)
     " Extract results"
-    genesInRes = as.character(rownames(res))
-    n = paste0(c1,"__",c2)
+    # genesInRes = as.character(rownames(res))
+   
+    outpt.list = list(
+        "dds" = dds,
+        "outpt" = outpt
+    )
+    # outpt.list[["dds"]] = dds
+    # outpt.list[["outpt"]] = outpt
+    # 
     " -- Data from DESeq "
-    return(outpt)
+    
+    return(outpt.list)
 }
 
-message("Here ....")
+message("Reading comparisons file ...")
+comparisons = read.table(comparisonsFile)
 
-res.results = getDESeq2(counttable, sample.matrix, "Control", "BCOR_shRNA")
+allComps = list()
+alldds = list()
+for(i in 1:nrow(comparisons)){
+    c1 = as.character(comparisons[i,1])
+    c2 = as.character(comparisons[i,2])
+    message("-- Comparing ", c1, " and ", c2)
+    res.results = getDESeq2(counttable, sample.matrix, annot_data, c1, c2)
+    n = paste0(c1,"__",c2)
+    allComps[[n]] = res.results$outpt
+    alldds[[n]] = res.results$dds
+}
 
+" Write data to excel sheet"
+WriteXLS(allComps, ExcelFileName=paste(title,".deseqAll.xlsx",sep=""), row.names=F)
 
-
-
-save.image("temp.RData")
-q(status = 0)
-library(WriteXLS)
-WriteXLS(res.results, ExcelFileName=paste(title,".deseqAll.xlsx",sep=""), row.names=F)
-
-# 
-# " Write results "
-# fold = paste(c1, "VS", c2, sep="_")
-# system(paste("mkdir ", fold), intern = F)
-# library(WriteXLS)
-# WriteXLS(res.results, ExcelFileName=paste(fold,"/deseqAll.xlsx",sep=""), row.names=F)
-# 
-# " Plots "
-# plot.volcano <- function(res, lfc, pval){
-#     tab = data.frame(logFC = res$log2FoldChange, negLogPval = -log10(res$pvalue))
-#     head(tab)
-#     par(mar = c(5, 4, 4, 4))
-#     plot(tab, pch = 16, cex = 0.6, xlab = expression(log[2]~fold~change), ylab = expression(-log[10]~pvalue))
-#     signGenes = (abs(tab$logFC) > lfc & tab$negLogPval > -log10(pval))
-#     points(tab[signGenes, ], pch = 16, cex = 0.8, col = "red") 
-#     abline(h = -log10(pval), col = "green3", lty = 2) 
-#     abline(v = c(-lfc, lfc), col = "blue", lty = 2) 
-#     mtext(paste("pval =", pval), side = 4, at = -log10(pval), cex = 0.8, line = 0.5, las = 1) 
-#     mtext(c(paste("-", lfc, "fold"), paste("+", lfc, "fold")), side = 3, at = c(-lfc, lfc), cex = 0.8, line = 0.5)
-# }
-# 
-# pdf(paste(fold,"/deseq.pdf",sep=""),5,5)
+# pdf(paste(title,".deseq.pdf",sep=""),5,5)
 # plotMA(res, frame=F, alpha=0.05)
 # plot.volcano(res, 1, 0.05)
 # plotDispEsts(dds)
 # dev.off()
+
+save.image(paste0(title,".deseq2.RData"))
+q(status = 0)
+
+
+# > head(counttable)
+# BCOR_shRNA1 BCOR_shRNA2 Control_shRNA1 Control_shRNA2 Control2_shRNA1 Control2_shRNA2 Ring1_RNF2_shRNA1
+# ENSG00000223972.5           1           0              0              0               0               0                 0
+# ENSG00000227232.5           1           0              0              0               1               0                 1
+# ENSG00000278267.1           0           0              0              0               0               0                 0
+# ENSG00000243485.5           0           0              0              0               2               0                 2
+# ENSG00000284332.1           0           0              0              0               0               0                 0
+# ENSG00000237613.2           0           0              0              0               0               0                 0
+# Ring1_RNF2_shRNA2
+# ENSG00000223972.5                 0
+# ENSG00000227232.5                 0
+# ENSG00000278267.1                 0
+# ENSG00000243485.5                 1
 # 
+# > head(sample.matrix)
+# condition    libtype
+# BCOR_shRNA1     BCOR_shRNA paired-end
+# BCOR_shRNA2     BCOR_shRNA paired-end
+# Control_shRNA1     Control paired-end
+# Control_shRNA2     Control paired-end
+# Control2_shRNA1   Control2 paired-end
+# Control2_shRNA2   Control2 paired-end
 # 
-# " Save R image"
-# save.image(paste(fold,"/deseq.RData",sep=""))
+# > head(annot_data)
+# gene_name           gene_id           coords strand  source
+# 1     DDX11L1 ENSG00000223972.5 chr1:11869-14409      +  HAVANA
+# 2      WASH7P ENSG00000227232.5 chr1:14404-29570      -  HAVANA
+# 3   MIR6859-1 ENSG00000278267.1 chr1:17369-17436      - ENSEMBL
+# 4 MIR1302-2HG ENSG00000243485.5 chr1:29554-31109      +  HAVANA
+# 5   MIR1302-2 ENSG00000284332.1 chr1:30366-30503      + ENSEMBL
+# 6     FAM138A ENSG00000237613.2 chr1:34554-36081      -  HAVANA
+# 
+#res.results = getDESeq2(counttable, sample.matrix, annot_data, "Control", "BCOR_shRNA")
+
+

@@ -28,7 +28,6 @@ if [ $# -eq 0 ] ; then
 fi
 
 case "$1" in
-	
     "star" )
 	        source $mconf_installdir/bin/star.sh ;;
 	"bedGraphToBigWig" )
@@ -39,7 +38,9 @@ case "$1" in
 			source $mconf_installdir/bin/countTableSTAR.sh ;;
 	"deseq2" )
 			$mconf_Rscript $mconf_installdir/bin/deseq2.R ;;
-	
+	"countTableToTPM" )
+			$mconf_Rscript $mconf_installdir/bin/countTableToTPM.R ;;
+			
 # Downloads
 	"irodsDownload" )
 			source $mconf_installdir/bin/irodsDownload.sh ;;
@@ -53,5 +54,9 @@ case "$1" in
 			source $mconf_installdir/bin/test.sh ;;
 	"testR" )
 			$mconf_Rscript $mconf_installdir/bin/test.R ;;
+# farm
+	"farmsub" )
+			source $mconf_installdir/bin/farmsub.sh ;;
+
 esac
 
