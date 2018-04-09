@@ -27,13 +27,20 @@ if [ $# -eq 0 ] ; then
 	pisan_help
 fi
 
+if [ $# -ge 2 ] ; then
+	date=`date`
+	echo "[$date] $@" > $HOME/.pisan.cmds
+fi
+
+
 case "$1" in
-    "star" )
-	        source $mconf_installdir/bin/star.sh ;;
-	"bedGraphToBigWig" )
-			source $mconf_installdir/bin/bedGraphToBigWig.sh ;;
-	
+# farm
+	"farmsub" )
+			source $mconf_installdir/bin/farmsub.sh ;;
+
 # RNASeq
+ "star" )
+	        source $mconf_installdir/bin/star.sh ;;
 	"countTableSTAR" )
 			source $mconf_installdir/bin/countTableSTAR.sh ;;
 	"deseq2" )
@@ -47,6 +54,11 @@ case "$1" in
 # Chipseq	
 	"macs2" )
 			source $mconf_installdir/bin/macs2.sh ;;
+# Procs
+   
+	"bedGraphToBigWig" )
+			source $mconf_installdir/bin/bedGraphToBigWig.sh ;;
+
 # Visualisation
 	"ucscCreateHub" )
 			source $mconf_installdir/bin/ucscCreateHub.sh ;;
@@ -54,9 +66,7 @@ case "$1" in
 			source $mconf_installdir/bin/test.sh ;;
 	"testR" )
 			$mconf_Rscript $mconf_installdir/bin/test.R ;;
-# farm
-	"farmsub" )
-			source $mconf_installdir/bin/farmsub.sh ;;
+
 
 esac
 

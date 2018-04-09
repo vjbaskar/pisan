@@ -30,6 +30,13 @@ mandatory(){
 
 ## Functions to generate bsub script
 
+farmGroup(){
+	c=`echo $HOSTNAME | grep cgp -c`
+	if [ "$c" -eq "0" ]; then
+		echo "#BSUB -G ${farmgroup}"
+	fi
+}
+
 coreBSUB() {
 # - core bsub function
 	#command=$1
@@ -41,8 +48,8 @@ echo "
 #BSUB -M ${mem} 
 #BSUB -R \"select[mem>${mem}] rusage[mem=${mem}] span[hosts=1] \" 
 #BSUB -n $procs 
-#BSUB -q ${queue} 
-#BSUB -G team163-grp"
+#BSUB -q ${queue}"
+farmGroup
 }
 
 jobName(){
@@ -138,13 +145,12 @@ writeBSUB "$command" > ${title}.${comments}.bsub
 
 # Submit job
 temp=`tempfile`
-echo "bsub < ${title}.${comments}.bsub > $temp"
+bsub < ${title}.${comments}.bsub > $temp
 
-:<<'COMMENTS'
+
 # Get job id
 jid=`head -1 $temp | awk ' { print $2 } ' | sed -e "s/>//g" | sed -e "s/<//g"`
 print_stderr ">> Job title: ${title}.${comments}.bsub >> Job ID = $jid"
 echo "[date = `date`] [operation = $title] [comments = $comments] [bsub_file = $ofile] [job_id = $jid] [log = ${ofile}] [command = ${fullcommand}]" >> joblists.lsf
 print_stderr "" >> joblists.lsf
 echo "$jid"
-COMMENTS

@@ -30,6 +30,7 @@ Options available:
 -j|--waitForJob) [job_name] - Job name to wait.
 -w|--wait) no args. Wait for the job to finish
 -c|--comments) sample ids or names to be added
+-G|--farmgroup) farmgroup; farm3 = team163-grp [default], cgp2-farm-login = team163
 the bsub scripts will have title.comments.bsub file names
 
 **** - program specific args. 
