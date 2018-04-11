@@ -1,13 +1,32 @@
 commands available:
 ------------------
 
-Align: star
-conversions: bedGraphToBigWig
-irods: irodsDownload
-rna-seq: countTableSTAR deseq countTableToTPM
-chip-seq: macs2
-tracks: ucsccreatehub
-farm: farmsub
+Align: 
+	star = STAR basic alignment of RNA-seq data
+
+Conversions: 
+	bedGraphToBigWig = bg -> bw
+	bammerge = merges multiple bam files -> sorts -> indexes
+	
+irods: 
+	irodsDownload = main program to download data from iRODS
+	
+rna-seq: 
+	countTableSTAR = generate counttable from STAR gene counts
+	deseq = run deseq2 
+	countTableToTPM = converts counttable to TPM using deseq2 for normalisation
+	
+fusion: 
+	ericscript = Uses EricScript for identifying fusion transcripts
+
+chip-seq: 
+	macs2 = peak calling and track generation using MACS2
+
+tracks: 
+	ucsccreatehub = creates ucsc track hub in web-bfint
+
+farm: 
+	farmsub = main script to submit to farm
 
 * = untested
 

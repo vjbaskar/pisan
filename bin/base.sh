@@ -28,3 +28,15 @@ print_stderr "
 "
 	exit 2
 fi
+
+
+
+# farm submission
+# if [ ! -z "$farm" ]; then
+# 	export fileOfCommands=$commandFile
+# 	export concurrentJobs=20
+# 	$mconf_installdir/bin/farmsub.sh
+# else 
+# 	warnsms "Not running as farm: Not recommended"
+# 	warnsms "$mconf_bashexec $commandFile"
+# fi

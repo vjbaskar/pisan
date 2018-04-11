@@ -1,4 +1,4 @@
-# Script: MACS2 data
+# Script: Main script
 
 # Main config file
 source ~/.$USER/pisan.conf
@@ -7,6 +7,13 @@ source ~/.$USER/pisan.conf
 #echo $args_return
 if [ ! -z "$conf" ]; then
 	source $conf # config file in the local directory can override the default ones
+fi
+
+if [ $# -gt 3 ] ; then
+	cwd=`pwd`
+	cwd=`readlink -f $cwd`
+	date=`date`
+	echo "[$date] [$HOSTNAME] [$cwd] $@" >> $HOME/.$USER/pisan/pisan.cmds
 fi
 
 # export variables
@@ -21,52 +28,52 @@ cat $mconf_installdir/cfgs/commands
 exit 2
 }
 
-
-
 if [ $# -eq 0 ] ; then
 	pisan_help
-fi
-
-if [ $# -ge 2 ] ; then
-	date=`date`
-	echo "[$date] $@" > $HOME/.pisan.cmds
 fi
 
 
 case "$1" in
 # farm
 	"farmsub" )
-			source $mconf_installdir/bin/farmsub.sh ;;
+		source $mconf_installdir/bin/farmsub.sh ;;
 
 # RNASeq
  "star" )
-	        source $mconf_installdir/bin/star.sh ;;
+	    source $mconf_installdir/bin/star.sh ;;
 	"countTableSTAR" )
-			source $mconf_installdir/bin/countTableSTAR.sh ;;
+		source $mconf_installdir/bin/countTableSTAR.sh ;;
 	"deseq2" )
-			$mconf_Rscript $mconf_installdir/bin/deseq2.R ;;
+		$mconf_Rscript $mconf_installdir/bin/deseq2.R ;;
 	"countTableToTPM" )
-			$mconf_Rscript $mconf_installdir/bin/countTableToTPM.R ;;
+		$mconf_Rscript $mconf_installdir/bin/countTableToTPM.R ;;
+	# Fusion
+		"ericscript" )
+			source $mconf_installdir/bin/ericscript.sh ;;
 			
 # Downloads
 	"irodsDownload" )
-			source $mconf_installdir/bin/irodsDownload.sh ;;
+		source $mconf_installdir/bin/irodsDownload.sh ;;
 # Chipseq	
 	"macs2" )
-			source $mconf_installdir/bin/macs2.sh ;;
+		source $mconf_installdir/bin/macs2.sh ;;
 # Procs
    
 	"bedGraphToBigWig" )
-			source $mconf_installdir/bin/bedGraphToBigWig.sh ;;
+		source $mconf_installdir/bin/bedGraphToBigWig.sh ;;
+	"bammerge" )
+		source $mconf_installdir/bin/bammerge.sh ;;
 
 # Visualisation
 	"ucscCreateHub" )
-			source $mconf_installdir/bin/ucscCreateHub.sh ;;
+		source $mconf_installdir/bin/ucscCreateHub.sh ;;
+# Test tools
 	"test" )
-			source $mconf_installdir/bin/test.sh ;;
+		source $mconf_installdir/bin/test.sh ;;
 	"testR" )
-			$mconf_Rscript $mconf_installdir/bin/test.R ;;
+		$mconf_Rscript $mconf_installdir/bin/test.R ;;
 
 
 esac
+
 

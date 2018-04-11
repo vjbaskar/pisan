@@ -84,8 +84,8 @@ echo "
 #BSUB -e .bsub/${ofile}.%I.farm
 #BSUB -J \"${ofile}[1-$totalJobs]%${concurrentJobs}\"
 command=\`sed -e \"\${LSB_JOBINDEX}q;d\" $fileOfCommands\`
-echo \$command
-\$command
+echo \"\$command\"
+eval \"\$command\"
 "
 }
 
@@ -147,10 +147,12 @@ writeBSUB "$command" > ${title}.${comments}.bsub
 temp=`tempfile`
 bsub < ${title}.${comments}.bsub > $temp
 
-
 # Get job id
 jid=`head -1 $temp | awk ' { print $2 } ' | sed -e "s/>//g" | sed -e "s/<//g"`
 print_stderr ">> Job title: ${title}.${comments}.bsub >> Job ID = $jid"
 echo "[date = `date`] [operation = $title] [comments = $comments] [bsub_file = $ofile] [job_id = $jid] [log = ${ofile}] [command = ${fullcommand}]" >> joblists.lsf
 print_stderr "" >> joblists.lsf
 echo "$jid"
+
+rm -f $temp
+
