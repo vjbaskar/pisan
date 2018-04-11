@@ -5,9 +5,7 @@ If you provide a conf file with the commands it will overwrite options of pisan.
 
 ## Main command
 
-pisan -h
-
-
+pisan 
 
 # Depends on
 
@@ -21,4 +19,9 @@ pisan -h
 * star
 * Any relevant bio tools should be added to $PATH
 
+# How it works
+
+pisan sources the main and local config files. Local config files overwrite main config
+
+It then reads in arguments from src/general_args.sh and functions from src/basic_functions.sh
 
