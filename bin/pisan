@@ -54,6 +54,8 @@ case "$1" in
 # Downloads
 	"irodsDownload" )
 		source $mconf_installdir/bin/irodsDownload.sh ;;
+	"irodsSampleInfo" )
+		source $mconf_installdir/bin/irodsSampleInfo.sh ;;
 # Chipseq	
 	"macs2" )
 		source $mconf_installdir/bin/macs2.sh ;;
@@ -63,6 +65,8 @@ case "$1" in
 		source $mconf_installdir/bin/bedGraphToBigWig.sh ;;
 	"bammerge" )
 		source $mconf_installdir/bin/bammerge.sh ;;
+	"bam2bw" )
+		source $mconf_installdir/bin/bam2bw.sh ;;
 
 # Visualisation
 	"ucscCreateHub" )

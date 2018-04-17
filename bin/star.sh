@@ -3,13 +3,16 @@
 
 if [ $args_return -gt 0 ]; then
 print_stderr "
-	++ Mandatory args: procs mem paired organism inputFile title
+	++ Mandatory args: 
+	-t|--title
+	-f|--inputFile
+	-o|--organism = Your genome should be present in mconf_starindex variable of your global or local conf
+					For eg. Your index should be eventually of the form {mconf_starindex}/{organism}
+
 	++ recommended: 
-	title = alpha-num string
-	mem=32000   
-	procs=1
-	paired: 0/1
-	organism options: Your genome should be present in mconf_starindex variable of your global or local conf file 
+	-m|--mem=32000   
+	-p|--procs=1
+	-r|--paired: 0/1
 	inputFile: 
 	SRR6144783	WT1
 	SRR6144784	WT2

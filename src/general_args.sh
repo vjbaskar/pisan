@@ -47,7 +47,7 @@ fi
 
 
 SHORT="s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:a:W:T:j:G:Fw0:1:2:3:4:5:h"
-LONG="sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,conf:,title:,queue:,organism:,paired:,qval:,inputFile:,chrType:,command:,gtf:,array:,walltime:,concurrent:,waitForJob:,farmgroup:,farm,wait,file0:,file1:,file2:,file3:,file4:,file5:,help"
+LONG="sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,inputFile:,title:,queue:,organism:,paired:,qval:,conf:,chrType:,command:,gtf:,array:,walltime:,concurrent:,waitForJob:,farmgroup:,farm,wait,file0:,file1:,file2:,file3:,file4:,file5:,help"
 #params="$(getopt -o s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:a:W:T:j:w1:2:3:4:5:h -l sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,conf:,title:,queue:,organism:,paired:,qval:,inputFile:,chrType:,command:,gtf:,array:,walltime:, concurrent:,waitForJob:,wait,file0:,file1:,file2:,file3:,file4:,file5:,help "$0" -- "$@")"
 params="$(getopt -o $SHORT -l $LONG --name "$0" -- "$@")"
 eval set -- "$params"
@@ -76,7 +76,7 @@ do
 			
 		-q|--queue)	queue=$2; shift 2;;
 
-		-f|--conf) conf=$2; shift 2;;
+		-f|--inputFile) inputFile=$2; shift 2;;
 			
 		-o|--organism) organism=$2; shift 2;; 
 			
@@ -84,7 +84,7 @@ do
 		
 		-v|--qval) qval=$2; shift 2;;
 		
-		-u|--inputFile) inputFile=$2; shift 2;; # command specific
+		-u|--conf) conf=$2; shift 2;; # command specific
 			
 		-y|--chrType) chrType=$2; shift 2;; # ensembl or ucsc
 			

@@ -1,23 +1,18 @@
-# Script: MACS2 data
-
-# Main config file
-#source ~/.$USER/pisan.conf
-#! $mconf_bashexec
-
-# get the exec dir
-# basedir=`readlink -f $0 | xargs dirname`
-#source $mconf_installdir/src/general_args.sh
-#source $mconf_installdir/src/basic_functions.sh
-
-#if [ ! -z "$conf" ]; then
-#	source $conf # config file in the local directory can override the default ones
-#fi
-
+# All args come from pisan command
 
 if [ $args_return  -gt 0 ]; then
 print_stderr "
-	++ Mandatory args: organism, paired, qval, inputFile, mem, procs
-	++ recommended: mem=10000   procs=1
+	++ Mandatory args: 
+	-t|--title
+	-c|--comment
+	-f|--inputFile
+	-g|--genome = hs,mm
+	-e|--expType
+	
+	++ recommended: 
+	-F|--farm = flag
+	-m|--mem=20000   # becomes bigger with bam file size
+	-p|--procs=1
 	
 	organism options: hs,mm
 

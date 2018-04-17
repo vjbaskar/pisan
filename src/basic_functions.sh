@@ -1,14 +1,18 @@
-
+d=`date +"%d/%m/%y %T"`
 ## Functions for messaging to user
 sms(){
 	messaging=$1
-	d=`date`
-	echo "[ $d ] $messaging"
+	echo "[ $d ] $messaging" > /dev/stderr
+}
+
+sms_nonewline(){
+	messaging=$1
+	echo -n "[ $d ] $messaging"
 }
 
 infosms(){
 	messaging=$1
-	echo "[ Info ] $messaging"
+	echo "[ Info ] $messaging" > /dev/stderr
 }
 
 warnsms(){
@@ -46,3 +50,4 @@ export -f infosms
 export -f sms
 export -f warnsms
 export -f errorsms
+export -f sms_nonewline

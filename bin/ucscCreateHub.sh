@@ -4,10 +4,17 @@ print_stderr "
 	++ Mandatory args: title, organism
 	
 	options: 
-	organism: hg19,hg38 etc.
-	title: alpha numeric 
-
-
+	-t|--title = short name of the hub
+	-c|--comments = long name of the hub
+	-o|--organism = ucsc organism names such as hg19,hg38,mm10 etc
+	-u|--inputFile
+	
+	inputFile format:
+	-----------------
+	file1.bw	10,12,255
+	file2.bw	255,40,1
+	
+	Get rgb colours from https://www.rapidtables.com/web/color/RGB_Color.html
 "
 	exit 2
 fi
@@ -16,25 +23,13 @@ p=`pwd`
 BASE_DIR=$mconf_installdir
 name=$title
 genome=$organism
-
-#### Generate random colours
-colour() {
-	r=`shuf -i 1-255 -n 1`
-	g=`shuf -i 1-255 -n 1`
-	b=`shuf -i 1-255 -n 1`
-	echo "$r,$g,$b"
-}
-
-colour() {
-	c=`randomLines $BASE_DIR/../data/palette1.txt 1 stdout`
-	echo $c
-}
-
+inputFile=`readlink -f $inputFile`
 #### generate bigwig track
 getbw() {
 	bw=$1
+	c=$2
 	track_name=`basename $bw .bw`
-	c=`colour`
+	#c=`colour`
 	echo "
 track $track_name
 bigDataUrl $bw
@@ -43,10 +38,10 @@ longLabel $track_name
 maxHeightPixel 40:40:11 
 color $c
 visibility full
-smoothingWindow 5
+smoothingWindow 2
 windowingFunction mean
 type bigWig 0 200
-autoScale off
+autoScale on
 viewLimits 0:20
 
 	"
@@ -54,11 +49,11 @@ viewLimits 0:20
 }
 
 #### generate hubs
-longLabel=`pwd  | xargs basename`
+#longLabel=`pwd  | xargs basename`
 #cat > hub.txt <<'EOF' 
-echo "hub $name
-shortLabel $name
-longLabel $longLabel
+echo "hub $title
+shortLabel $title
+longLabel $comments
 genomesFile genomes.txt
 email vm11@sanger.ac.uk
 descriptionUrl desc.html" > hub.txt
@@ -77,9 +72,15 @@ cp *.bw $genome
 
 #### Populate the trackDb
 
+
 cd $genome
-for file in `ls *.bw`
+echo -n "" > trackDb.txt
+while read line
 do
-	getbw $file
-done > trackDb.txt
+	l=($line)
+	file=${l[0]}
+	colour=${l[1]}
+	sms "Processing >> $file"
+	getbw $file $colour >> trackDb.txt
+done < $inputFile 
 

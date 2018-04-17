@@ -7,10 +7,10 @@ Align:
 Conversions: 
 	bedGraphToBigWig = bg -> bw
 	bammerge = merges multiple bam files -> sorts -> indexes
-	
+	bam2bw = bam to bigWig
 irods: 
 	irodsDownload = main program to download data from iRODS
-	
+	irodsSampleInfo = program to get sample information from sample ids
 rna-seq: 
 	countTableSTAR = generate counttable from STAR gene counts
 	deseq = run deseq2 
@@ -23,7 +23,7 @@ chip-seq:
 	macs2 = peak calling and track generation using MACS2
 
 tracks: 
-	ucsccreatehub = creates ucsc track hub in web-bfint
+	ucscCreateHub = creates ucsc track hub in web-bfint
 
 farm: 
 	farmsub = main script to submit to farm

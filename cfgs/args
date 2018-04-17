@@ -12,15 +12,15 @@ Options available:
 -c|--comments) user comments that can be added to metadata. Only alpha-numerics
 -p|--procs) total processors (threads)
 -m|--mem) total memory in MB
--f|--conf) configuration file
+-f|--inputFile) command specific option. Input files for certain commands
 -q|--queue) queue type [normal,small,long,basement,yesterday]
 -o|--organism) command specific option. read below
 -g|--gtf) gtf file
 -r|--paired) paired reads or not [0,1]
 -v|--qval) pvalue or q value cut off [0-1]
--u|--inputFile) command specific option. Input files for certain commands
+-u|--conf) configuration file
 -y|--chrType) chromosome type [ucsc,ensembl]
-
+-F|--farm) start the command in farm
 
 **** Farm specific options
 -x|--command) Command to be run. Used by farmsub.
@@ -35,9 +35,9 @@ the bsub scripts will have title.comments.bsub file names
 
 **** - program specific args. 
 -0|--file0) optional file0 reserved for specific commands
--1|--file1) optional file0 reserved for specific commands
--2|--file2) optional file0 reserved for specific commands
--3|--file3) optional file0 reserved for specific commands
--4|--file4) optional file0 reserved for specific commands
--5|--file5) optional file0 reserved for specific commands
+-1|--file1) optional file1 reserved for specific commands
+-2|--file2) optional file2 reserved for specific commands
+-3|--file3) optional file3 reserved for specific commands
+-4|--file4) optional file4 reserved for specific commands
+-5|--file5) optional file5 reserved for specific commands
 

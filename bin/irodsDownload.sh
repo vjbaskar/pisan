@@ -3,7 +3,9 @@
 
 if [ $args_return  -gt 0 ]; then
 print_stderr "
-++ Mandatory args: title, sampleFile
+++ Mandatory args: 
+-t|--title
+-s|--sampleFile = sample file is csv file with specific format
 "
 exit 2
 fi
@@ -49,21 +51,14 @@ function md5sumCheck(){
 	lanes=$1; shift # 3,4,5,6
 	lanes=`echo "$lanes" | sed -e "s/,/ /g"`
 
-	echo "
-	*******
-	run id = $runId
-	sample name = $sample
-	file type = $filetype
-	lanes = $lanes
-	*******
-	" 
+	sms " runid = $runId | sample name = $sample | file type = $filetype | lanes = $lanes" 
 
 	ofile=${sample}
 	targetFolder=$sample
 	
 	rm -rf $targetFolder
 	if [ ! -z $targetFolder ]; then
-		infosms "Dumping data in $targetFolder"
+		sms "Dumping data in $targetFolder "
 		mkdir $targetFolder
 	fi
 #imeta qu -z seq -d id_run = $id_run and target = 1 and manual_qc = 1 and sample = $sample > $imetafile
@@ -74,7 +69,7 @@ function md5sumCheck(){
 		do
 			md5checkVal=0
 			imetafile=$targetFolder/${runId}.${sample}.$i.imeta
-			echo "Getting data for lane = $i"
+			echo -en "\r \033[33m>>\033[0m Searching lane, $i"
 			imeta qu -z seq -d type = $filetype and target = 1 and lane = $i and id_run = $runId and sample = $sample > $imetafile
 			wc=`cat $imetafile | grep cram | wc -l`
 			p=`pwd`

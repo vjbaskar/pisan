@@ -7,7 +7,7 @@ print_stderr "
 	++ Mandatory args: 
 	t|title
 	c|comments
-	u|inputFile
+	f|inputFile
 	0|file0 = database file in $mconf_ericscript_db in pisan.conf
 	
 	++ recommended: 
@@ -30,7 +30,7 @@ loadSamtools="module remove hgi/samtools/0.1.19; module load hgi/samtools/0.1.19
 cp -R $mconf_ericscript $p
 ericscript=`basename $mconf_ericscript`
 
-commandFile="$title.ericscript.cmds"
+commandFile="$title.$comments.cmds"
 echo -n "" > $commandFile
 while read line
 do

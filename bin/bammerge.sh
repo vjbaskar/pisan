@@ -25,7 +25,7 @@ print_stderr "
 	
 	++ Recommended to run in farm:
 	-F|farm
-	-m|memory 2000
+	-m|memory 500
 	-p|procs 1
 	
 	submits as array since $inputFile is a text file
