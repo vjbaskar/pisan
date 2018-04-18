@@ -24,7 +24,7 @@ set +a # switch it back off
 
 pisan_help() 
 {
-cat $mconf_installdir/cfgs/commands
+cat "$mconf_installdir/cfgs/commands"
 exit 2
 }
 
@@ -52,10 +52,16 @@ case "$1" in
 			source $mconf_installdir/bin/ericscript.sh ;;
 			
 # Downloads
+	# iRODS
 	"irodsDownload" )
 		source $mconf_installdir/bin/irodsDownload.sh ;;
 	"irodsSampleInfo" )
 		source $mconf_installdir/bin/irodsSampleInfo.sh ;;
+	"createProject" )
+		$mconf_Rscript $mconf_installdir/bin/createProject.R ;;
+	"irodsMergeCramsToBam" )
+		source $mconf_installdir/bin/irodsMergeCramsToBam.sh ;;
+	
 # Chipseq	
 	"macs2" )
 		source $mconf_installdir/bin/macs2.sh ;;
@@ -67,10 +73,13 @@ case "$1" in
 		source $mconf_installdir/bin/bammerge.sh ;;
 	"bam2bw" )
 		source $mconf_installdir/bin/bam2bw.sh ;;
+	"bam2fq" )
+		source $mconf_installdir/bin/bam2fq.sh ;;
 
 # Visualisation
 	"ucscCreateHub" )
 		source $mconf_installdir/bin/ucscCreateHub.sh ;;
+
 # Test tools
 	"test" )
 		source $mconf_installdir/bin/test.sh ;;

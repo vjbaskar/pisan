@@ -1,9 +1,44 @@
-if [ $args_return  -gt 0 ]; then
-print_stderr "
-	++ Mandatory args: mem,procs,queue,command,title,comments
 
-"
+Help() { 
+echo -en "\033[31m"
+cat << EOM
+++ Mandatory args: 
+-t|--title
+-c|--comments
+
+++ recommended: 
+-q|--queue=normal
+-m|--mem=20000   # becomes bigger with bam file size
+-p|--procs=1
+-x|--command
+
+organism options: hs,mm
+
+***** inputFile format
+4010STDY7036819	C_3143NTA
+4010STDY7036820	C_3143NTB
+4010STDY7036821	C_3143NTC
+4010STDY7036822	C_3143CISWTA
+4010STDY7036823	C_3143CISWTB
+4010STDY7036824	C_3143CISWTC
+4010STDY7036825	C_3143CISMUTA
+4010STDY7036826	C_3143CISMUTB
+4010STDY7036827	C_3143CISMUTC
+	
+EOM
+echo -en "\033[30m"
+}
+
+
+if [ $args_return  -gt 0 ]; then
+	Help
 	exit 2
+fi
+
+mandatory_fails=`mandatory title comments`
+if [ `echo "$mandatory_fails" | wc -w` -gt 0 ]; then
+	warnsms "mandatory check failed"
+	errorsms "Set: $mandatory_fails"
 fi
 
 
@@ -21,6 +56,10 @@ optional(){
 	if [  -z "$procs" ]; then
 		warnsms "procs not set. Setting it to default = 1"
 		export procs=1
+	fi
+	if [  -z "$concurrent" ]; then
+		warnsms "concurrent jobs not set. Setting it to default = 20"
+		export concurrent=20
 	fi
 }
 
@@ -76,13 +115,13 @@ echo "#BSUB -w 'done(${jobIDtoWait})'"
 arrayBSUB(){
 # - Run as array
 	totalJobs=`cat $fileOfCommands | wc -l`
-	if [ -z ${concurrentJobs} ]; then
-		concurrentJobs=${totalJobs}
+	if [ -z ${concurrent} ]; then
+		concurrent=${totalJobs}
 	fi
 echo "
 #BSUB -o .bsub/${ofile}.%I.farm
 #BSUB -e .bsub/${ofile}.%I.farm
-#BSUB -J \"${ofile}[1-$totalJobs]%${concurrentJobs}\"
+#BSUB -J \"${ofile}[1-$totalJobs]%${concurrent}\"
 command=\`sed -e \"\${LSB_JOBINDEX}q;d\" $fileOfCommands\`
 echo \"\$command\"
 eval \"\$command\"
@@ -145,8 +184,9 @@ writeBSUB "$command" > ${title}.${comments}.bsub
 
 # Submit job
 temp=`tempfile`
-bsub < ${title}.${comments}.bsub > $temp
 
+#echo "bsub < ${title}.${comments}.bsub > $temp"
+bsub < ${title}.${comments}.bsub > $temp
 # Get job id
 jid=`head -1 $temp | awk ' { print $2 } ' | sed -e "s/>//g" | sed -e "s/<//g"`
 print_stderr ">> Job title: ${title}.${comments}.bsub >> Job ID = $jid"

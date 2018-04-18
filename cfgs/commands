@@ -1,32 +1,36 @@
 commands available:
 ------------------
 
-Align: 
++ Align: 
 	star = STAR basic alignment of RNA-seq data
 
-Conversions: 
-	bedGraphToBigWig = bg -> bw
-	bammerge = merges multiple bam files -> sorts -> indexes
-	bam2bw = bam to bigWig
-irods: 
-	irodsDownload = main program to download data from iRODS
-	irodsSampleInfo = program to get sample information from sample ids
-rna-seq: 
-	countTableSTAR = generate counttable from STAR gene counts
++ Conversions: 
+	bedGraphToBigWig	=	bg -> bw
+	bammerge	=	merges multiple bam files -> sorts -> indexes
+	bam2bw	=	bam to bigWig
+	bam2fq	=	bam/cram to fastq
+
++ irods: 
+	irodsDownload	=	main program to download data from iRODS
+	irodsSampleInfo	=	program to get sample information from sample ids
+	createProject	=	Converts the master csv file to tsv file. Useful for extracting cols from csv.
+	irodsMergeCramsToBam	=	After irodsDownload, run this to merge crams to a single bam file.
+	
++ rna-seq: 
+	countTableSTAR	=	generate counttable from STAR gene counts
 	deseq = run deseq2 
 	countTableToTPM = converts counttable to TPM using deseq2 for normalisation
 	
-fusion: 
++ fusion: 
 	ericscript = Uses EricScript for identifying fusion transcripts
 
-chip-seq: 
++ chip-seq: 
 	macs2 = peak calling and track generation using MACS2
 
-tracks: 
++ tracks: 
 	ucscCreateHub = creates ucsc track hub in web-bfint
 
-farm: 
++ farm: 
 	farmsub = main script to submit to farm
 
-* = untested
 

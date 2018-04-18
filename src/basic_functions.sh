@@ -17,11 +17,11 @@ infosms(){
 
 warnsms(){
 	messaging=$1
-	echo "[ Warning ] $messaging" > /dev/stderr
+	echo -e "\033[0;33m[ Warning ] $messaging\033[0m" > /dev/stderr
 }
 errorsms(){
 	messaging=$1
-	echo "[ Error ] $messaging" > /dev/stderr
+	echo -e "\033[0;31m[ Error ] $messaging\033[0m" > /dev/stderr
 	exit 1
 }
 print_stderr(){
@@ -37,9 +37,8 @@ mandatory(){
 	while [ $# -gt 0 ]; 
 	do
 		x=$1
-
-		if [ ! -z ${!x} ]; then
-			echo $x			
+		if [ -z ${!x} ]; then
+			printf "$x "			
 		fi
 		shift
 	done

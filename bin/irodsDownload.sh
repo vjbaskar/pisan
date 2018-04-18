@@ -69,7 +69,7 @@ function md5sumCheck(){
 		do
 			md5checkVal=0
 			imetafile=$targetFolder/${runId}.${sample}.$i.imeta
-			echo -en "\r \033[33m>>\033[0m Searching lane, $i"
+			echo -en "\r \033[33m>> Searching lane, $i \033[0m"
 			imeta qu -z seq -d type = $filetype and target = 1 and lane = $i and id_run = $runId and sample = $sample > $imetafile
 			wc=`cat $imetafile | grep cram | wc -l`
 			p=`pwd`
@@ -89,6 +89,7 @@ function md5sumCheck(){
 					
 			fi
 		done
+		echo ""
 	return 0
 }
 

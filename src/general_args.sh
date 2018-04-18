@@ -96,7 +96,7 @@ do
 		
 		-W|--walltime) walltime=$2; shift 2;; # farm sub option
 			
-		-T|--concurrent) concurrentJobs=$2; shift 2;; # farm sub option
+		-T|--concurrent) concurrent=$2; shift 2;; # farm sub option
 		
 		-j|--waitForJob) jobIDtoWait=$2; shift 2;; # farm sub option
 		
