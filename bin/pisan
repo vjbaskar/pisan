@@ -9,12 +9,11 @@ if [ ! -z "$conf" ]; then
 	source $conf # config file in the local directory can override the default ones
 fi
 
-if [ $# -gt 3 ] ; then
-	cwd=`pwd`
-	cwd=`readlink -f $cwd`
-	date=`date`
-	echo "[$date] [$HOSTNAME] [$cwd] $@" >> $HOME/.$USER/pisan/pisan.cmds
-fi
+
+cwd=`pwd`
+cwd=`readlink -f $cwd`
+export cwd=$cwd	
+export pisanCommand="$@"
 
 # export variables
 set -a # exports the variables as environment variables --> Useful for R scripts
@@ -39,14 +38,18 @@ case "$1" in
 		source $mconf_installdir/bin/farmsub.sh ;;
 
 # RNASeq
- "star" )
+ 	"star" )
 	    source $mconf_installdir/bin/star.sh ;;
+	 "salmon" )
+	    source $mconf_installdir/bin/salmon.sh ;;
+	
 	"countTableSTAR" )
 		source $mconf_installdir/bin/countTableSTAR.sh ;;
 	"deseq2" )
 		$mconf_Rscript $mconf_installdir/bin/deseq2.R ;;
 	"countTableToTPM" )
 		$mconf_Rscript $mconf_installdir/bin/countTableToTPM.R ;;
+	
 	# Fusion
 		"ericscript" )
 			source $mconf_installdir/bin/ericscript.sh ;;
@@ -65,8 +68,20 @@ case "$1" in
 # Chipseq	
 	"macs2" )
 		source $mconf_installdir/bin/macs2.sh ;;
+	"homerCreateTagDir" )
+		source $mconf_installdir/bin/homerCreateTagDir.sh ;;
+	"homerHistonePeaks" )
+		source $mconf_installdir/bin/homerHistonePeaks.sh ;;
+		
+# CRISPR
+	"mageckCount" )
+		source $mconf_installdir/bin/mageckCount.sh ;;
+	"mageckCompare" )
+		source $mconf_installdir/bin/mageckCompare.sh ;;	
+	"mageckXYsgRNA" )
+		source $mconf_installdir/bin/mageckXYsgRNA.sh ;;	
+
 # Procs
-   
 	"bedGraphToBigWig" )
 		source $mconf_installdir/bin/bedGraphToBigWig.sh ;;
 	"bammerge" )
@@ -75,10 +90,18 @@ case "$1" in
 		source $mconf_installdir/bin/bam2bw.sh ;;
 	"bam2fq" )
 		source $mconf_installdir/bin/bam2fq.sh ;;
+	"filterCols" )
+		$mconf_Rscript $mconf_installdir/bin/filterCols.R ;;
+	"hist" )
+		source $mconf_installdir/bin/hist.sh ; export nohistory=1 ;;	
 
 # Visualisation
 	"ucscCreateHub" )
 		source $mconf_installdir/bin/ucscCreateHub.sh ;;
+
+# Set operations
+	"gsea" )
+		source $mconf_installdir/bin/gsea.sh ;;
 
 # Test tools
 	"test" )

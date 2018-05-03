@@ -8,8 +8,8 @@ getPrjName <- function(projectCSV){
 
 info <- function(text){
     text =  sapply(text, function(x) paste0(x, sep=" ", collapse = " "))
-    d = date()
-    cat(" [ Info: ", d, "]\n")
+    d = format(Sys.time(), "%d/%m/%y %T")
+    cat(" [ Info: ", d, "] ")
     cat(text,"\n")
 }
 

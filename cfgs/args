@@ -1,10 +1,7 @@
-Options available:
------------------
-**** - mandatory args
 
+ARGUMENTS
++ cmd line args
 -t|--title) title of project
-
-
 -s|--sampleFile) samplefile.csv
 -i|--id) sanger id or sample id in the samplefile.csv
 -e|--expType) rnaseq or chipseq
@@ -13,17 +10,20 @@ Options available:
 -p|--procs) total processors (threads)
 -m|--mem) total memory in MB
 -f|--inputFile) command specific option. Input files for certain commands
--q|--queue) queue type [normal,small,long,basement,yesterday]
 -o|--organism) command specific option. read below
 -g|--gtf) gtf file
+-O|--outpt) outpt
 -r|--paired) paired reads or not [0,1]
 -v|--qval) pvalue or q value cut off [0-1]
 -u|--conf) configuration file
 -y|--chrType) chromosome type [ucsc,ensembl]
--F|--farm) start the command in farm
+-H|--nohistory) Do not add this command to pisan history. Go incognito!
+-P|--progArgs) arguments that can be passed to specific commands.
 
-**** Farm specific options
++ Farm specific options
+-F|--farm) start the command in farm
 -x|--command) Command to be run. Used by farmsub.
+-q|--queue) queue type [normal,small,long,basement,yesterday]
 -a|--array) [file of commands]. - Runs each line in the file 
 -W|--walltime) [walltime, hh:mm] - Set a timed job
 -T|--concurrent) [total number of concurrent array jobs] - if -a is specified you this to set number of jobs. 
@@ -31,13 +31,14 @@ Options available:
 -w|--wait) no args. Wait for the job to finish
 -c|--comments) sample ids or names to be added
 -G|--farmgroup) farmgroup; farm3 = team163-grp [default], cgp2-farm-login = team163
+
 the bsub scripts will have title.comments.bsub file names
 
-**** - program specific args. 
--0|--file0) optional file0 reserved for specific commands
--1|--file1) optional file1 reserved for specific commands
--2|--file2) optional file2 reserved for specific commands
--3|--file3) optional file3 reserved for specific commands
--4|--file4) optional file4 reserved for specific commands
--5|--file5) optional file5 reserved for specific commands
++ program specific args. 
+-0|--cmd0) optional cmd0 reserved for specific commands
+-1|--cmd1) optional cmd1 reserved for specific commands
+-2|--cmd2) optional cmd2 reserved for specific commands
+-3|--cmd3) optional cmd3 reserved for specific commands
+-4|--cmd4) optional cmd4 reserved for specific commands
+-5|--cmd5) optional cmd5 reserved for specific commands
 

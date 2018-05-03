@@ -1,0 +1,123 @@
+---
+title: "Mageck XY"
+author: "Vijay"
+date: "29/04/2018"
+output: 
+  html_document: 
+    theme: united
+    highlight: tango
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(cowplot)
+library(ggplot2)
+library(gridGraphics)
+library(plotly) 
+library(dplyr)
+library(getopt)
+library(knitr)
+library(DT)
+
+```
+
+# Reading files
+
+
+```{r readFiles}
+
+
+mconf_installdir=Sys.getenv("mconf_installdir")
+source(paste0(mconf_installdir,"/src/basic_functions.R"))
+title = Sys.getenv("title")
+comments = Sys.getenv("comments")
+inputFile = Sys.getenv("inputFile") # mageck_C_2102NT..vs..C_2102ARAMUT.sgrna_summary.txt
+fdr_cutoff = Sys.getenv("qval")
+gRNA_number_cutoff = Sys.getenv("cmd0")
+cwd=Sys.getenv("cwd")
+
+test_outpt <- read.table(paste0(cwd,"/",inputFile), head=T)
+
+```
+# Variables
+
+```{r variables, echo = F}
+message("title = ", title)
+message("comments = ", comments)
+message("input = ", inputFile)
+message("fdr <= ", fdr_cutoff)
+message("total gRNAs/gene <= fdr cutoff = ", gRNA_number_cutoff)
+message("Working dir = ", cwd)
+
+```
+
+
+# Assign colours to genes
+
+``` {r GeneColourAllotment}
+color = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
+gene.matrix <- data.frame(Gene = unique(test_outpt$Gene), col = sample(color, length(unique(test_outpt$Gene)), replace = T))
+test_outpt <- merge(test_outpt, gene.matrix, by = "Gene")
+```
+
+```{r processData}
+test_outpt$control_mean = round(log10(test_outpt$control_mean + 1),3)
+test_outpt$treat_mean = round(log10(test_outpt$treat_mean + 1),3)
+
+test_filt = test_outpt [ (test_outpt$FDR <= fdr_cutoff) , ]
+temp <- table(test_filt$Gene)
+temp <- temp [ temp >= gRNA_number_cutoff ]
+genesToConsider <- unique(names(temp))
+
+test_filt <- test_filt [ test_filt$Gene %in% genesToConsider, ]
+gRNAsToConsider <- as.character(test_filt$sgrna)
+
+test_outpt$G <- test_outpt$Gene
+test_yes <- test_outpt [ (test_outpt$sgrna  %in% gRNAsToConsider & test_outpt$Gene %in% genesToConsider),  ]
+test_no <- test_outpt [ ! (test_outpt$sgrna  %in% gRNAsToConsider & test_outpt$Gene %in% genesToConsider),  ]
+
+test_yes$alpha = 1
+test_no$alpha = 0.01
+test_no$G <- "unselected"
+test_no$col <- "ivory1"
+
+inputMatrix <- rbind(test_yes, test_no)
+```
+
+
+# Linear modelling for getting residuals
+
+``` {r linearModelling}
+#formulation <- as.formula(paste(e1,"~",e2))
+formulation <- as.formula("treat_mean ~ control_mean")
+lm_model <- lm(formulation, data = inputMatrix)
+lm_res <- residuals(lm_model)
+```
+```{r plotting, echo = FALSE}
+
+genesList <- unique(as.character(test_yes$Gene))
+col_vec = sample(color, length(unique(genesList)), replace = T)
+names(col_vec) <- genesList
+
+
+p = ggplot(data = test_no, aes(x = control_mean, y = treat_mean))+ geom_point(alpha = 0.2, colour="gray88")
+p <- p + geom_point(data = test_yes, aes(x = control_mean, y = treat_mean, color = G))+ scale_color_manual(values = col_vec)  + theme(legend.position = "bottom", legend.text=element_text(size=5)) + stat_smooth(data = inputMatrix,aes(x = control_mean, y = treat_mean) , method = "lm", col = "red") + theme(legend.position = "none")
+
+print(p)
+
+p <- ggplot() + geom_point(data = test_yes, aes(x = control_mean, y = treat_mean, color = G))+  scale_color_manual(values = col_vec)  + theme(legend.position = "bottom") + stat_smooth(data = inputMatrix,aes(x = control_mean, y = treat_mean) , method = "lm", col = "red")
+
+ggplotly(p)
+```
+
+# Table of the qualified sgRNAs
+The means given here are log10(mean+1)
+
+```{r writeOutTable, echo=F, warning=F, message=F}
+write.csv(test_yes, file=paste0(title, ".", comments,".csv"), row.names=F)
+reqCols <- c("Gene", "sgrna", "high_in_treatment", "control_mean", "treat_mean", "score", "LFC", "FDR")
+datatable(test_yes[,reqCols], rownames = F)
+```

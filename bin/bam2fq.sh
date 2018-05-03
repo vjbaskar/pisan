@@ -44,7 +44,7 @@ bam2fastq() {
 	OUTPUT="$sampleID.fq"
 	#tfile=`tempfile -d ./`
 	command="$mconf_biobambam2/bamtofastq inputformat=bam S=$OUTPUT.gz filename=$INPUT gz=-1"
-	echo "$command #; rm -f $tfile"
+	echo "$command"
 	fi
 
 	if [ $paired -eq 1 ]; then

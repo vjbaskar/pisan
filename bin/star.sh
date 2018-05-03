@@ -5,6 +5,7 @@ if [ $args_return -gt 0 ]; then
 print_stderr "
 	++ Mandatory args: 
 	-t|--title
+	-c|--comments
 	-f|--inputFile
 	-o|--organism = Your genome should be present in mconf_starindex variable of your global or local conf
 					For eg. Your index should be eventually of the form {mconf_starindex}/{organism}
@@ -32,7 +33,7 @@ threads=$procs
 genome=$organism
 namefile=$inputFile
 index=$mconf_starindex/${organism}
-
+index=${organism}
 
 
 seAlign() {
@@ -49,7 +50,7 @@ seAlign() {
 		--outSAMtype BAM Unsorted \
 		--outSAMunmapped Within \
 		--quantMode GeneCounts
-		bamsormadup SO=coordinate M=temp.metrics indexfilename=${OUTPUT_PREFIX}sormadup.bam.bai < ${OUTPUT_PREFIX}Aligned.out.bam > ${OUTPUT_PREFIX}sormadup.bam
+		$mconf_biobambam2/bamsormadup SO=coordinate M=temp.metrics indexfilename=${OUTPUT_PREFIX}sormadup.bam.bai < ${OUTPUT_PREFIX}Aligned.out.bam > ${OUTPUT_PREFIX}sormadup.bam
 	"
 }
 
@@ -68,7 +69,7 @@ peAlign() {
 		--outSAMtype BAM Unsorted \
 		--outSAMunmapped Within \
 		--quantMode GeneCounts 
-		bamsormadup SO=coordinate M=temp.metrics indexfilename=${OUTPUT_PREFIX}sormadup.bam.bai < ${OUTPUT_PREFIX}Aligned.out.bam > ${OUTPUT_PREFIX}sormadup.bam
+		$mconf_biobambam2/bamsormadup SO=coordinate M=temp.metrics indexfilename=${OUTPUT_PREFIX}sormadup.bam.bai < ${OUTPUT_PREFIX}Aligned.out.bam > ${OUTPUT_PREFIX}sormadup.bam
 		#samtools sort -@ $threads ${OUTPUT_PREFIX}Aligned.out.bam -o ${OUTPUT_PREFIX}bam
 	"
 }
@@ -91,5 +92,15 @@ do
 		echo "sh $id.$name.star.sh" >> $title.star.cmds
 
 done < $namefile
-#sub_ncores normal star $mem $threads $name "sh $id.$name.star.sh"
-farm..sub -q normal -n star -m $mem -p $threads -s batch -t 20 -a $title.star.cmds
+
+
+# farm submission: commandfile var = commandFile
+if [ ! -z "$farm" ]; then
+	export fileOfCommands=$title.star.cmds
+	$mconf_installdir/bin/farmsub.sh
+else 
+	warnsms "Not running as farm: Not recommended"
+	warnsms "$mconf_bashexec $commandFile"
+fi
+
+

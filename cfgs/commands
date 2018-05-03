@@ -1,36 +1,63 @@
-commands available:
-------------------
-
-+ Align: 
+COMMANDS
++ Align:
+-------- 
 	star = STAR basic alignment of RNA-seq data
 
-+ Conversions: 
-	bedGraphToBigWig	=	bg -> bw
-	bammerge	=	merges multiple bam files -> sorts -> indexes
-	bam2bw	=	bam to bigWig
-	bam2fq	=	bam/cram to fastq
++ Conversions:
+-------------- 
+	++ bam/cram/sam
+		bammerge = merges multiple bam files -> sorts -> indexes
+		bam2bw = bam to bigWig
+		bam2fq = bam/cram to fastq	
+	++ bed/bedGraphs/wigs/bigWigs
+		bedGraphToBigWig = bg -> bw
+
 
 + irods: 
-	irodsDownload	=	main program to download data from iRODS
-	irodsSampleInfo	=	program to get sample information from sample ids
-	createProject	=	Converts the master csv file to tsv file. Useful for extracting cols from csv.
-	irodsMergeCramsToBam	=	After irodsDownload, run this to merge crams to a single bam file.
+-------- 
+	irodsDownload = main program to download data from iRODS
+	irodsSampleInfo = program to get sample information from sample ids
+	createProject = Converts the master csv file to tsv file. Useful for extracting cols from csv.
+	irodsMergeCramsToBam = After irodsDownload, run this to merge crams to a single bam file.
 	
 + rna-seq: 
-	countTableSTAR	=	generate counttable from STAR gene counts
+----------
+
+	countTableSTAR = generate counttable from STAR gene counts
 	deseq = run deseq2 
 	countTableToTPM = converts counttable to TPM using deseq2 for normalisation
+	salmon = salmon quantification
 	
 + fusion: 
+---------
 	ericscript = Uses EricScript for identifying fusion transcripts
 
 + chip-seq: 
+-----------
 	macs2 = peak calling and track generation using MACS2
+	homerCreateTagDir = creates tag directory using HOMER. Useful if using HOMER functions.
+	
++ crispr:
+---------
+	++ mageck:
+		mageckCount = sgRNA count table.
+		mageckCompare = mageck pairwise comparisons from count table.
+		mageckXYsgRNA = generates a R markdown file with sgRNA summary plotted.
+
++ Set operations
+-----------------
+	++ genes:
+		gsea = gene set enrichment analysis using BI GSEA.jar
+	++ tables:
+		filterCols = given a tsv or csv file, it filters required cols
 
 + tracks: 
+----------
 	ucscCreateHub = creates ucsc track hub in web-bfint
 
-+ farm: 
++ system:
+--------  
 	farmsub = main script to submit to farm
+	hist = history of pisan commands
 
 

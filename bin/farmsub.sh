@@ -12,19 +12,8 @@ cat << EOM
 -p|--procs=1
 -x|--command
 
-organism options: hs,mm
+++ Look above in ARGUMENTS for more options
 
-***** inputFile format
-4010STDY7036819	C_3143NTA
-4010STDY7036820	C_3143NTB
-4010STDY7036821	C_3143NTC
-4010STDY7036822	C_3143CISWTA
-4010STDY7036823	C_3143CISWTB
-4010STDY7036824	C_3143CISWTC
-4010STDY7036825	C_3143CISMUTA
-4010STDY7036826	C_3143CISMUTB
-4010STDY7036827	C_3143CISMUTC
-	
 EOM
 echo -en "\033[30m"
 }
@@ -57,9 +46,11 @@ optional(){
 		warnsms "procs not set. Setting it to default = 1"
 		export procs=1
 	fi
-	if [  -z "$concurrent" ]; then
-		warnsms "concurrent jobs not set. Setting it to default = 20"
-		export concurrent=20
+	if [ ! -z "$fileOfCommands" ]; then
+		if [  -z "$concurrent" ]; then
+			warnsms "concurrent jobs not set. Setting it to default = 20"
+			export concurrent=20
+		fi
 	fi
 }
 
@@ -69,12 +60,12 @@ mandatory(){
 
 ## Functions to generate bsub script
 
-farmGroup(){
-	c=`echo $HOSTNAME | grep cgp -c`
-	if [ "$c" -eq "0" ]; then
-		echo "#BSUB -G ${farmgroup}"
-	fi
-}
+# farmGroup(){
+# 	c=`echo $HOSTNAME | grep cgp -c`
+# 	if [ "$c" -eq "0" ]; then
+# 		echo "#BSUB -G ${farmgroup}"
+# 	fi
+# }
 
 coreBSUB() {
 # - core bsub function
@@ -88,7 +79,7 @@ echo "
 #BSUB -R \"select[mem>${mem}] rusage[mem=${mem}] span[hosts=1] \" 
 #BSUB -n $procs 
 #BSUB -q ${queue}"
-farmGroup
+#farmGroup
 }
 
 jobName(){

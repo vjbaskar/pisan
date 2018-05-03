@@ -20,6 +20,7 @@
 # T = concurrent
 # j = waitForJob
 # w = wait
+# H = nohistory
 # G  = farm group
 # F = submit in farm or HPC
 
@@ -36,18 +37,18 @@ if [ $# -le 1 ]; then
 	print_help
 fi
 
-
-#set -o errexit -o noclobber -o nounset -o pipefail
-set -o errexit -o pipefail
-
-if [ $# -gt 4 ]; then
-	d=`date`
-	echo "[ $d ] $@" > .pisan.cmds
+if [ $# -le 4 ]; then
+	nohistory=1
 fi
 
 
-SHORT="s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:a:W:T:j:G:Fw0:1:2:3:4:5:h"
-LONG="sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,inputFile:,title:,queue:,organism:,paired:,qval:,conf:,chrType:,command:,gtf:,array:,walltime:,concurrent:,waitForJob:,farmgroup:,farm,wait,file0:,file1:,file2:,file3:,file4:,file5:,help"
+#set -o errexit -o noclobber -o nounset -o pipefail
+set -o errexit -o pipefail
+export pisanCommand="$@"
+
+
+SHORT="s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:O:a:W:T:j:G:P:FHw0:1:2:3:4:5:h"
+LONG="sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,inputFile:,title:,queue:,organism:,paired:,qval:,conf:,chrType:,command:,gtf:,outpt:,array:,walltime:,concurrent:,waitForJob:,farmgroup:,progArgs:,farm,nohistory,wait,cmd0:,cmd1:,cmd2:,cmd3:,cmd4:,cmd5:,help"
 #params="$(getopt -o s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:a:W:T:j:w1:2:3:4:5:h -l sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,conf:,title:,queue:,organism:,paired:,qval:,inputFile:,chrType:,command:,gtf:,array:,walltime:, concurrent:,waitForJob:,wait,file0:,file1:,file2:,file3:,file4:,file5:,help "$0" -- "$@")"
 params="$(getopt -o $SHORT -l $LONG --name "$0" -- "$@")"
 eval set -- "$params"
@@ -92,6 +93,8 @@ do
 			
 		-g|--gtf) gtf=$2; shift 2;;
 		
+		-O|--outpt) outpt=$2; shift 2;;
+		
 		-a|--array) fileOfCommands=$2; shift 2;; # farm sub option
 		
 		-W|--walltime) walltime=$2; shift 2;; # farm sub option
@@ -102,21 +105,25 @@ do
 		
 		-G|--farmgroup) farmgroup=$2; shift 2;; # farm sub option
 		
+		-P|--progArgs) progArgs=$2; shift 2;; # farm sub option
+		
 		-w|--wait) wait_to_finish=1; shift;; # farm sub option
 		
 		-F|--farm) farm=1; shift;; # farm sub option
 		
-		-0|--file0) file0=$2; shift 2;;
+		-H|--nohistory) nohistory=1; shift;; # farm sub option
 		
-		-1|--file1) file1=$2; shift 2;;
+		-0|--cmd0) cmd0=$2; shift 2;;
+		
+		-1|--cmd1) cmd1=$2; shift 2;;
 			
-		-2|--file2) file2=$2; shift 2;;
+		-2|--cmd2) cmd2=$2; shift 2;;
 
-		-3|--file3) file3=$2; shift 2;;
+		-3|--cmd3) cmd3=$2; shift 2;;
 			
-		-4|--file4) file4=$2; shift 2;;
+		-4|--cmd4) cmd4=$2; shift 2;;
 			
-		-5|--file5) file5=$2; shift 2;;
+		-5|--cmd5) cmd5=$2; shift 2;;
 			
 		--)
 			shift
@@ -149,3 +156,15 @@ if [  -z "$farmgroup" ]; then
 	farmgroup="team163-grp"
 fi
 
+# To write history or not.
+# If nohistory=1, no history is written. 
+if [  -z "$nohistory" ]; then
+	nohistory=0
+fi
+
+if [ $nohistory -eq 0 ]; then
+	d=`date +%d/%m/%Y`
+	t=`date +%T`
+	echo "[ $d ] [ $t ] $pisanCommand" >> $HOME/.$USER/pisan/pisan.cmds
+	echo "[ $d ] [ $t ] $pisanCommand" >> .pisan.cmds
+fi

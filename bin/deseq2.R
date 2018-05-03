@@ -11,7 +11,7 @@ title:
 gtfFile: gtf file using which the count table was generated
 inputFile: count table
 sampleFile: file containing <name> <condn> <library type>
-file0: file containing comparisons
+cmd0: file containing comparisons
 
 SampleFile:  <name> <condn> <library type>
 BCOR_shRNA1.star.ReadsPerGene.out.tab	BCOR_shRNA1	BCOR_shRNA	paired-end
@@ -20,7 +20,7 @@ Control_shRNA1.star.ReadsPerGene.out.tab	Control_shRNA1	Control	paired-end
 Control_shRNA2.star.ReadsPerGene.out.tab	Control_shRNA2	Control	paired-end
 Note: <name> will not be used in this case.
 
-file0: comparisons.txt
+cmd0: comparisons.txt
 Control BCOR_shRNA
 
 		")
@@ -32,7 +32,7 @@ message(title)
 gtfFile=Sys.getenv("gtf")
 countTable=Sys.getenv("inputFile")
 sampleMatrix = Sys.getenv("sampleFile")
-comparisonsFile = Sys.getenv("file0")
+comparisonsFile = Sys.getenv("cmd0")
 
 message("Loading libraries")
 suppressMessages({
