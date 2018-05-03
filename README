@@ -18,6 +18,8 @@ pisan
 * bwa
 * star
 * Any relevant bio tools should be added to $PATH
+* anaconda python = create a python2.7 environment with name p27
+* anaconda python = create a python3 environment with name p3
 
 # How it works
 
