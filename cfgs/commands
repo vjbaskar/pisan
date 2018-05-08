@@ -58,6 +58,7 @@ COMMANDS
 + system:
 --------  
 	farmsub = main script to submit to farm
+	farmhist = history of farm submission in that directory.
 	hist = history of pisan commands
 
 

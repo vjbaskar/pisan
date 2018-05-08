@@ -7,7 +7,7 @@ cat << EOM
 -t|--title
 -c|--comments
 -f|--inputFile: sgRNA summary file from mageck
--q|--qval: [ 0 - 1], eg. 0.2
+-v|--qval: [ 0 - 1], eg. 0.2
 -0|--cmd0: total sgRNA/gene > cmd0 with fdr <= qval, eg. 3
 
 EOM

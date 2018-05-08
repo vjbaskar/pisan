@@ -36,6 +36,8 @@ case "$1" in
 # farm
 	"farmsub" )
 		source $mconf_installdir/bin/farmsub.sh ;;
+	"farmhist" )
+		$mconf_php $mconf_installdir/bin/farmhist.php ;;	
 
 # RNASeq
  	"star" )
