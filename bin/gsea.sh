@@ -44,7 +44,7 @@ cut -f $fields $inputFile > $rankFile
 echo "Correcting input rank file"
 tmpfile=`tempfile -d ./`
 tr '[a-z]' '[A-Z]' < $rankFile | grep -v "GENE" | grep -v "BASEMEAN" > $tmpfile
-sort -n -k 2 $tmpfile > $tmpfile.1
+sort -nr -k 2 $tmpfile > $tmpfile.1
 echo -e "#gene_name\tstat" > $rankFile
 cat $tmpfile.1 >> $rankFile
 rm -f $tmpfile*
@@ -56,7 +56,7 @@ echo -n "" > $commandFile
 for set in  c2.all c4.all c5.all c6.all c7.all c2.cp c2.cp.kegg c2.cgp c5.bp 
 do	
 	mkdir -p $outputFolder/${set}
-	cmd="java -cp $mconf_gseaJarFile -Xmx${mem}m xtools.gsea.GseaPreranked -gmx gseaftp.broadinstitute.org://pub/gsea/gene_sets/${set}.v5.2.symbols.gmt -collapse false -mode Max_probe -norm meandiv -nperm $nperm -rnk $rankFile -scoring_scheme classic -rpt_label $comment -chip gseaftp.broadinstitute.org://pub/gsea/annotations/GENE_SYMBOL.chip -include_only_symbols true -make_sets true -plot_top_x 500 -rnd_seed timestamp -set_max 500 -set_min 15 -zip_report false -out $outputFolder/${set} -gui false ; zip $outputFolder/${set}.zip $outputFolder/${set}/*"
+	cmd="java -cp $mconf_gseaJarFile -Xmx${mem}m xtools.gsea.GseaPreranked -gmx gseaftp.broadinstitute.org://pub/gsea/gene_sets/${set}.v5.2.symbols.gmt -collapse false -mode Max_probe -norm meandiv -nperm $nperm -rnk $rankFile -scoring_scheme classic -rpt_label $comment -chip gseaftp.broadinstitute.org://pub/gsea/annotations/GENE_SYMBOL.chip -include_only_symbols true -make_sets true -plot_top_x 500 -rnd_seed timestamp -set_max 500 -set_min 15 -zip_report false -out $outputFolder/${set} -gui false ; zip ${outputFolder}.${set}.zip $outputFolder/${set}/*"
 	echo $cmd >> $commandFile
 done
 

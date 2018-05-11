@@ -67,7 +67,7 @@ do
 	samples2=`getSamples $expt2 $inputFile`
 	
 	n="mageck_${expt1}..vs..${expt2}"
-	echo "mageck test -k $countFile -t $samples2 -c $samples1 -n $n" >> $commandFile
+	echo "mageck test -k $countFile -t $samples2 -c $samples1 -n $n --normcounts-to-file" >> $commandFile
 done < $comparisonsFile
 
 # farm submission: commandfile var = commandFile

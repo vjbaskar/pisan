@@ -70,7 +70,9 @@ while read line
 	if [ "$c" -eq 1 ]; then
 		echo "Found only one file. No merging required"
 		file=`cat ${sampleID}.tomerge.txt`
-		cp $file $sampleName.cram
+		#cp $file $sampleName.cram
+		command="samtools view -@ ${procs} -b -o $sampleName.bam $file"
+		echo $command >> $title.mergecram.cmds
 		#exit 0
 	fi
 

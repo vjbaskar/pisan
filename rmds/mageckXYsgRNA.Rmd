@@ -3,11 +3,11 @@ title: "Mageck XY"
 author: "Vijay"
 date: "29/04/2018"
 output: 
-  html_document: 
-    theme: united
-    highlight: tango
+html_document: 
+theme: united
+highlight: tango
 editor_options: 
-  chunk_output_type: console
+chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -21,15 +21,14 @@ library(dplyr)
 library(getopt)
 library(knitr)
 library(DT)
+library(reshape2)
 
 ```
 
-# Reading files
+<!-- # Reading files -->
 
 
-```{r readFiles}
-
-
+```{r readFiles, echo=F}
 mconf_installdir=Sys.getenv("mconf_installdir")
 source(paste0(mconf_installdir,"/src/basic_functions.R"))
 title = Sys.getenv("title")
@@ -37,9 +36,25 @@ comments = Sys.getenv("comments")
 inputFile = Sys.getenv("inputFile") # mageck_C_2102NT..vs..C_2102ARAMUT.sgrna_summary.txt
 fdr_cutoff = Sys.getenv("qval")
 gRNA_number_cutoff = Sys.getenv("cmd0")
+interestedGenesFile = Sys.getenv("cmd1")
 cwd=Sys.getenv("cwd")
 
+#### Mac laptop options - for testing and development only
+#setwd("~/scratch119/ETIENNE/2018.04.PPM1D.EtienneJoanne.CRISPR/MAGECK/")
+# inputFile = "mageck_C_2102NT..vs..C_2102ARAMUT.sgrna_summary.txt"
+#fdr_cutoff = 0.9
+#gRNA_number_cutoff = 1
+# interestedGenesFile = "genes.txt"
+#cwd = getwd()
+
+
+
 test_outpt <- read.table(paste0(cwd,"/",inputFile), head=T)
+if(exists("interestedGenesFile")){
+    message("Reading the gene list interested")
+    interestedGenes <- as.character(read.table(paste0(cwd,"/",interestedGenesFile))$V1)
+    interestedGenes = toupper(interestedGenes)
+}
 
 ```
 # Variables
@@ -121,3 +136,27 @@ write.csv(test_yes, file=paste0(title, ".", comments,".csv"), row.names=F)
 reqCols <- c("Gene", "sgrna", "high_in_treatment", "control_mean", "treat_mean", "score", "LFC", "FDR")
 datatable(test_yes[,reqCols], rownames = F)
 ```
+
+# gRNA normalised counts for genes of interest
+
+```{r plotGenes, echo=F, warning=F, message=F, out.width='.49\\linewidth', fig.width=3, fig.height=3, fig.show='hold', fig.align='center'}
+df <- read.table(paste0(cwd,"/",inputFile), head=T)
+shortListed = df [df$Gene %in% interestedGenes, ]
+for(g in interestedGenes){
+     temp <- df [ df$Gene == g, c("sgrna", "Gene", "control_mean", "treat_mean")]
+     if(nrow(temp) > 0){
+          message(g)
+         temp <- melt(temp)
+         p <- ggplot(temp)
+         p <- p + aes(x = variable, y = value  ) + geom_violin(aes(colour = variable, fill=variable), alpha=0.2) + geom_jitter(aes(colour=variable), size=4) + scale_color_manual(values=c("red", "blue")) + scale_fill_manual(values=c("red", "blue")) + theme_minimal() + ggtitle(g) + ylab("Normalised gRNA counts") + theme(legend.position = "none")
+        # p <- ggplotly(p)
+         print(p)
+        
+     }
+}
+ ```
+
+```{r plotGeneTable, echo=F}
+ datatable(shortListed[,reqCols], rownames = F)
+```
+

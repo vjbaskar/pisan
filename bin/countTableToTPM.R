@@ -4,24 +4,42 @@
 args_return=Sys.getenv("args_return")
 if(args_return > 0){
     message("
-* Required Args:
+* Description:
+--------------
+Creates fpkm and tpm from count data.
+RPKM:
+----
+raw counts = counts + pseudocount (default = 1)
 
+1. Find genes with > pseudocount values. 
+2. Get the q(75) of it. q75 <- quantile(vec/sum(vec), 0.75)
+3. rpkm[gene,sample] = (count[gene,sample]+1)/(q75[sample]*10^6*geneLength[gene])
+
+TPM:
+---
+raw counts = counts + pseudocount (default = 1)
+1. length_normalised_counts = raw_counts/genelengths_kb
+2. Remove genes with > 0 values.
+3. q75 <- quantile(vec/sum(vec), 0.75)
+4. tpm[gene,sample] = (length_normalised_counts[gene,sample]+1)/q75[sample]
+
+
+Required Args:
+----------------
 title: 
 gtfFile: gtf file using which the count table was generated
 inputFile: count table
 sampleFile: file containing <name> <condn> <library type>
 
-SampleFile:  <name> <condn> <library type>
+Input information:
+-------------------
+>> SampleFile:  <name> <condn> <library type>
 BCOR_shRNA1.star.ReadsPerGene.out.tab	BCOR_shRNA1	BCOR_shRNA	paired-end
 BCOR_shRNA2.star.ReadsPerGene.out.tab	BCOR_shRNA2	BCOR_shRNA	paired-end
 Control_shRNA1.star.ReadsPerGene.out.tab	Control_shRNA1	Control	paired-end
 Control_shRNA2.star.ReadsPerGene.out.tab	Control_shRNA2	Control	paired-end
 
 Note: <name> will not be used in this case.
-
-file0: comparisons.txt
-Control BCOR_shRNA
-
 		")
     quit(status = 2)
 }
@@ -31,12 +49,21 @@ gtfFile=Sys.getenv("gtf")
 countTable=Sys.getenv("inputFile")
 sampleMatrix = Sys.getenv("sampleFile")
 
+#### For laptop
+setwd("/Volumes/scratch119/ETIENNE/2018.02.PPM1D.EtienneJoanne.RNASeq/TPMS/")
+title = "temp"
+gtfFile = "ensembl_75_transcriptome-1000Genomes_hs37d5.gtf"
+inputFile = "featurecount_table.txt"
+sampleMatrix = "samples.txt"
+####
+
 message("Loading libraries")
 suppressMessages({
     library(DESeq2)
     library(rtracklayer)
     library(GenomicFeatures)
     library(WriteXLS)
+    library(preprocessCore)
 })
 # title = "trial1"
 # gtfFile = "ensembl_75_transcriptome-1000Genomes_hs37d5.gtf"
@@ -58,6 +85,7 @@ message("[ Info ] Conditions =  ", paste0(conditions, sep=" "))
 #sample.matrix
 
 " Read in GTF file "
+info("Get gene lengths for normalisation")
 gtfData <- import.gff2(gtfFile)
 annot_data <- as.data.frame(gtfData)
 annot_data <- annot_data[ annot_data$type == "gene", ]
@@ -82,7 +110,8 @@ genesToConsider = as.character(names(geneLengths))
 
 
 " Read count table "
-x = read.table(countTable, head=T, row.names=1)
+info("Reading count table")
+x = read.table(inputFile, head=T, row.names=1)
 #tail(counttable)
 #dim(counttable)
 genes.table <- x [ ! grepl("__", rownames(x)), ]
@@ -107,28 +136,42 @@ dds <- estimateSizeFactors(dds)
 geneCounts <- counts(dds, normalized = FALSE)
 normCounts <- counts(dds, normalized = TRUE)
 
-"Calculate TPMS"
-geneLengths.kb <- geneLengths [ rownames(normCounts)] / 10^3 # geneLengths in kb
-tpm <- normCounts/geneLengths.kb  # Normalise for gene lengths
-dataNorm <- colSums(tpm)/10^6 # The column/expt wise normalised is on the geneLength-normalised-matrix
+info("Calculate TPMS")
+
+# function for upper quartile normalisation
+UQ <- function(y, cutoff){ # x is number vector
+    temp <- y [ y > cutoff ]
+    q75 <- quantile(temp/sum(temp), 0.75)
+    return(q75)
+}
+
+pseudoCount = 1
+rawCounts = geneCounts + pseudoCount
+geneLengths.kb <- geneLengths [ rownames(rawCounts) ] / 10^3 # geneLengths in kb
+tpm <- rawCounts/geneLengths.kb  # Normalise for gene lengths
+sf <- apply(tpm, 2, cutoff = 0, UQ)
+
+dataNorm <- sf # The column/expt wise normalised is on the geneLength-normalised-matrix
+
 #tpm <- tpm/dataNorm
 for(i in colnames(tpm)){
     message("Normalising for ", i)
     tpm[,i] = tpm[,i]/dataNorm[i]
 }
 
-" Write TPM to csv"
+info(" Write TPM to csv")
 write.table(tpm, file=paste(title,".tpm.tsv",sep=""), sep="\t", quote=F)
 write.csv(tpm, file=paste(title,".tpm.csv",sep=""))
 
-"Calculating FPKMs"
-dataNorm <- colSums(normCounts)/10^6
-rpkm <- normCounts/geneLengths.kb
+info("Calculating FPKMs")
+dataNorm <- apply(rawCounts, 2,cutoff = pseudoCount, UQ)
+rpkm <- rawCounts/geneLengths.kb
+
 for(i in colnames(rpkm)){
     message("Normalising for ", i)
-    rpkm[,i] = rpkm[,i]/dataNorm[i]
+    rpkm[,i] = rpkm[,i]/(dataNorm[i]*10^6)
 }
-" Write RPPM to csv"
+info(" Write RPPM to csv")
 write.table(rpkm, file=paste(title,".rpkm.tsv",sep=""), sep="\t", quote=F)
 write.csv(rpkm, file=paste(title,".rpkm.csv",sep=""))
 
