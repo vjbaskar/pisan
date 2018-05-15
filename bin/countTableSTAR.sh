@@ -29,8 +29,8 @@ do
 	condition=${l[2]} 	
 	echo "Reading $file >> $name"
 	 if [ $i -eq 0 ]; then
-		 echo "gene_name" | tee $title.unstranded.tsv $title.yes.frSS.tsv $title.rev.frFS.tsv > /dev/null
-		 awk ' { print $1 } ' $file | grep -v N_ | tee -a tee $title.unstranded.tsv $title.yes.frSS.tsv $title.rev.frFS.tsv > /dev/null
+		 echo "gene_name" | tee $title.unstranded.tsv $title.yes.frSS.SOLiD.tsv $title.rev.frFS.Illum.tsv > /dev/null
+		 awk ' { print $1 } ' $file | grep -v N_ | tee -a $title.unstranded.tsv $title.yes.frSS.SOLiD.tsv $title.rev.frFS.Illum.tsv > /dev/null
 	fi
 		# unstranded
 		echo $name > $t
@@ -40,13 +40,13 @@ do
 
 		echo $name > $t
 		cat $file | grep -v N_ | awk ' { print $3 } ' >> $t
-		paste $title.unstranded.tsv $t > $t.ss
-		mv $t.ss $title.yes.frSS.tsv
+		paste $title.yes.frSS.SOLiD.tsv $t > $t.ss
+		mv $t.ss $title.yes.frSS.SOLiD.tsv
 		
 		echo $name > $t
 		cat $file | grep -v N_ | awk ' { print $4 } ' >> $t
-		paste $title.unstranded.tsv $t > $t.fs
-		mv $t.fs $title.rev.frFS.tsv
+		paste $title.rev.frFS.Illum.tsv $t > $t.fs
+		mv $t.fs $title.rev.frFS.Illum.tsv
 	
 	i=`expr $i + 1`
 done < $sampleFile

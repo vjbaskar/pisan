@@ -37,8 +37,8 @@ function getMetaData(){
     reference=`cat $t | grep -A 1 "reference" | awk -F ":" ' $1 ~ "value"  { print $2 } ' | sed -e 's/ //g'`
     id_run=`cat $t | grep -A 1 "id_run" | awk -F ":" ' $1 ~ "value"  { print $2 } ' | sed -e 's/ //g'`
     is_paired_read=`cat $t | grep -A 1 "is_paired_read" | awk -F ":" ' $1 ~ "value"  { print $2 } ' | sed -e 's/ //g'`
-    printf "file_name\tid_run\tsample_donor_id\tsample_supplier_name\treference\tlibrary_type\tis_paired_read\n"
-    printf "$fileName\t$id_run\t$sample_donor_id\t$sample_supplier_name\t$reference\t$library_type\t$is_paired_read\n"
+    printf "sample_id\tfile_name\tid_run\tsample_donor_id\tsample_supplier_name\treference\tlibrary_type\tis_paired_read\n"
+    printf "${sample}\t$fileName\t$id_run\t$sample_donor_id\t$sample_supplier_name\t$reference\t$library_type\t$is_paired_read\n"
     rm -f $t
 }
 
