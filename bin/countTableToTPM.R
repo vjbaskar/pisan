@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
-
+library(getopt)
+mconf_installdir=Sys.getenv("mconf_installdir")
+source(paste0(mconf_installdir,"/src/basic_functions.R"))
 
 args_return=Sys.getenv("args_return")
 if(args_return > 0){
@@ -53,7 +55,7 @@ sampleMatrix = Sys.getenv("sampleFile")
 setwd("/Volumes/scratch119/ETIENNE/2018.02.PPM1D.EtienneJoanne.RNASeq/TPMS/")
 title = "temp"
 gtfFile = "ensembl_75_transcriptome-1000Genomes_hs37d5.gtf"
-inputFile = "featurecount_table.txt"
+countTable = "featurecount_table.txt"
 sampleMatrix = "samples.txt"
 ####
 
@@ -84,6 +86,17 @@ conditions = as.character(unique((sample.matrix$condition)))
 message("[ Info ] Conditions =  ", paste0(conditions, sep=" "))
 #sample.matrix
 
+" Read count table "
+info("Reading count table")
+x = read.table(countTable, head=T, row.names=1)
+info("Check if your count file is read correctly")
+x[1:5,1:5]
+#tail(counttable)
+#dim(counttable)
+genes.table <- x [ ! grepl("__", rownames(x)), ]
+nonGene.table <- x [ grepl("__", rownames(x)), ]
+counttable = genes.table
+
 " Read in GTF file "
 info("Get gene lengths for normalisation")
 gtfData <- import.gff2(gtfFile)
@@ -108,15 +121,6 @@ geneLengths <- sapply(genes_fusetxdb, function(x) sum(width(x)))
 " -- gene lengths available for: "
 genesToConsider = as.character(names(geneLengths))
 
-
-" Read count table "
-info("Reading count table")
-x = read.table(inputFile, head=T, row.names=1)
-#tail(counttable)
-#dim(counttable)
-genes.table <- x [ ! grepl("__", rownames(x)), ]
-nonGene.table <- x [ grepl("__", rownames(x)), ]
-counttable = genes.table
 "--> Filter out genes that you can not obtain exon size information"
 cat(" Total genes for which length available: ", length(genesToConsider))
 cat(" Total genes in count table : ", nrow(counttable))
@@ -135,6 +139,18 @@ dds <- DESeqDataSetFromMatrix(countData = counttable, colData = colData, design 
 dds <- estimateSizeFactors(dds)
 geneCounts <- counts(dds, normalized = FALSE)
 normCounts <- counts(dds, normalized = TRUE)
+
+
+mergeWithAnnotation <- function(matx, annot_data){
+    temp = rownames(matx)
+    temp <- sapply(temp, function(x) strsplit(x, "[.]")[[1]][1] ) 
+    rownames(matx) <- temp
+    annot_data$gene_id <- sapply(as.character(annot_data$gene_id), function(x) strsplit(x, "[.]")[[1]][1] ) 
+    annot_matx <- merge(annot_data, matx, by.x = "gene_id", by.y = "row.names", all.y=T)
+    return(annot_matx)
+}
+
+
 
 info("Calculate TPMS")
 
@@ -158,10 +174,11 @@ for(i in colnames(tpm)){
     message("Normalising for ", i)
     tpm[,i] = tpm[,i]/dataNorm[i]
 }
-
+tpm_annot = mergeWithAnnotation(tpm, annot_data) # merge tpm=rownames and annot_data = gene_id
 info(" Write TPM to csv")
 write.table(tpm, file=paste(title,".tpm.tsv",sep=""), sep="\t", quote=F)
 write.csv(tpm, file=paste(title,".tpm.csv",sep=""))
+write.csv(tpm_annot, file=paste(title,"annot.tpm.csv",sep=""))
 
 info("Calculating FPKMs")
 dataNorm <- apply(rawCounts, 2,cutoff = pseudoCount, UQ)
@@ -171,12 +188,13 @@ for(i in colnames(rpkm)){
     message("Normalising for ", i)
     rpkm[,i] = rpkm[,i]/(dataNorm[i]*10^6)
 }
+rpkm_annot = mergeWithAnnotation(rpkm, annot_data) # merge rpkm=rownames and annot_data = gene_id
 info(" Write RPPM to csv")
 write.table(rpkm, file=paste(title,".rpkm.tsv",sep=""), sep="\t", quote=F)
 write.csv(rpkm, file=paste(title,".rpkm.csv",sep=""))
+write.csv(rpkm_annot, file=paste(title,"annot.rpkm.csv",sep=""))
 
-
-
+save.image(paste0(title,"countTableToTPM.RData"))
 
 #gene = "ENSG00000000938"
 # > head(counttable)
