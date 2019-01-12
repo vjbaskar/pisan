@@ -1,0 +1,39 @@
+mconf_bashexec="/bin/bash"
+mconf_installdir="/software/team163/VIJAY/SOFT/__pipeline/legopipe/"
+mconf_starindex="/lustre/scratch119/casm/team163gv/SHARED/reference/star/"
+mconf_salmonindex="/lustre/scratch119/casm/team163gv/SHARED/reference/salmon/"
+#mconf_Rscript="/software/R-3.3.0/bin/Rscript"
+mconf_Rscript="/software/R-3.5.1/bin/Rscript"
+#mconf_R="/software/R-3.3.0/bin/R"
+mconf_R="/software/R-3.5.1/bin/R"
+mconf_php="/usr/bin/php"
+
+
+# LSF options
+mconf_sub="bsub"
+mconf_normal_queue="normal"
+mconf_default_queue="normal"
+mconf_long_queue="long"
+mconf_small_queue="small"
+mconf_yesterday_queue="yesterday"
+
+# Software
+mconf_ericscript="/software/team163/VIJAY/SOFT/__fusion/ericscript-0.5.5"
+mconf_biobambam2="/software/team163/VIJAY/SOFT/__bamcramsambed/bin/"
+mconf_mageck="/software/team163/VIJAY/SOFT/anaconda2/bin/"
+mconf_homer="/software/team163/VIJAY/SOFT/HOMER/bin/"
+mconf_gseaJarFile="/software/team163/VIJAY/SOFT/GSEA/gsea2-2.2.3.jar"
+mconf_salmon="/software/team163/VIJAY/SOFT/__rnaseq/Salmon-latest_linux_x86_64/bin"
+mconf_miso="/software/team163/VIJAY/SOFT/anaconda2/bin/miso"
+mconf_deeptools="/software/team163/VIJAY/SOFT/anaconda2/bin/"
+mconf_macs2="source activate p27 ; /software/team163/VIJAY/SOFT/anaconda2/envs/p27/bin/"
+mconf_parallel="/software/team163/VIJAY/SOFT/__core/parallel-20180322/src/"
+mconf_bwa="/nfs/users/nfs_v/vm11/SOFT/BWA/bwa-0.7.15/"
+mconf_samtools="/nfs/users/nfs_v/vm11/SOFT/SAMTOOLS/samtools-1.3.1/"
+mconf_spladder="$HOME/SOFT/__splicing/spladder/python"
+mconf_bismark="$HOME/SOFT/__methylseq/Bismark_v0.20.0"
+
+
+# Databases for software
+mconf_ericscript_db="/lustre/scratch119/casm/team163gv/SHARED/reference/fusion/ERICSCRIPT/"
+

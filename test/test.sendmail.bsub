@@ -1,0 +1,19 @@
+
+#!/bin/sh
+#source ~/.bashrc
+#BSUB -M 1000 
+#BSUB -R "select[mem>1000] rusage[mem=1000] span[hosts=1] " 
+#BSUB -n 1 
+#BSUB -q normal
+
+#BSUB -o .bsub/test.sendmail.farm
+#BSUB -e .bsub/test.sendmail.farm
+#BSUB -J test.sendmail
+
+echo "Job id = $LSB_JOBID "
+d=`date`
+echo "[ $d ] test.sendmail starts"
+sh test.sh
+d=`date`
+echo "[ $d ] test.sendmail ends"
+

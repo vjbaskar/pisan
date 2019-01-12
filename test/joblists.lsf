@@ -1,0 +1,4 @@
+[date = Mon Jul  9 11:44:35 BST 2018] [operation = test] [comments = sendmail] [bsub_file = test.sendmail] [job_id = 3999541] [log = test.sendmail] [command = sh test.sh]
+[date = Mon Jul  9 11:46:44 BST 2018] [operation = test] [comments = sendmail] [bsub_file = test.sendmail] [job_id = 3999570] [log = test.sendmail] [command = sh test.sh]
+[date = Mon Jul  9 11:47:15 BST 2018] [operation = test] [comments = sendmail] [bsub_file = test.sendmail] [job_id = 3999579] [log = test.sendmail] [command = sh test.sh]
+[date = Mon Jul  9 11:48:26 BST 2018] [operation = test] [comments = sendmail] [bsub_file = test.sendmail] [job_id = 3999596] [log = test.sendmail] [command = sh test.sh]

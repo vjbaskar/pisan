@@ -9,7 +9,7 @@ getPrjName <- function(projectCSV){
 info <- function(text){
     text =  sapply(text, function(x) paste0(x, sep=" ", collapse = " "))
     d = format(Sys.time(), "%d/%m/%y %T")
-    cat(" [ Info: ", d, "] ")
+    cat("[ Info: ", d, "] ")
     cat(text,"\n")
 }
 
@@ -22,27 +22,30 @@ errorMessage <- function(text){
     message(" [ Error: ", d, "]\n")
     message(text,"\n")
     cat("Quitting")
-    quit(save="yes", status=1)
+    quit(save="no", status=1)
 }
+
 
 createFileLink <- function(fileName){
     return(paste0(projectDir,"/", fileName))
 }
 
 stripNALines <- function(ss){
-    # row wise. If Run
+    # Remove NA cols
     temp = apply(ss, 2, unique)
-    ss = ss[, - which(is.na(temp))]
+    toRemoveCols = names(temp [ is.na(temp) ])
+    if(length(toRemoveCols) > 0 ){
+       # ss = dplyr::select(ss, ! ( colnames(ss) %in% toRemoveCols) )
+       ss = ss[, ! ( colnames(ss) %in% toRemoveCols) ]
+    }
+    # Remove data if no runid or sampleid present
     ss = ss [ !is.na(ss[,2]), ]
     ss = ss [ !is.na(ss[,1]), ]
-    
     return(ss)
 }
 
 cleanSheet <- function(ss){
-    
     ss = stripNALines(ss)
-    
     for(j in 1:ncol(ss)){
         ss[,j] <- as.character(ss[,j])
     }
@@ -56,7 +59,6 @@ cleanSheet <- function(ss){
             ss[i,j] <- keepOnlyAlphaNumeric(t)
         }
     }
-    
     cn <- colnames(ss)
     cn <- sapply(cn, keepOnlyAlphaNumeric)
     cn <- toupper(cn)
@@ -74,3 +76,59 @@ keepOnlyAlphaNumeric <- function(text){
     text = gsub("_*$", "",text)
     return(text)
 }
+
+# Check for reqd args.
+checkvars <- function(reqdArgs){
+    n=0
+    for(i in reqdArgs){
+        if(nchar(i)==0){
+            n = n + 1 
+        }
+    }
+    if(n > 0){
+        errorMessage("Provide all the above args")
+    }
+}
+
+Help <- function(helpVals){
+
+    formatHelp <- function(temp, n){
+    temp [ temp[,2] %in% n, 4 ] <- paste0( temp [ temp[,2] %in% n, 4 ], "\t", "<<--")
+    
+        for(i in 1:nrow(temp)){
+        	
+            cat(paste0("-",temp[i,1]),paste0("|--", temp[i,2]), temp[i,4],"\n")
+        }
+    }
+    n = c()
+    reqFields = helpVals[helpVals[,3] == 1,]
+    reqdArgs = unique(reqFields[,2])
+    for(i in reqdArgs){
+        temp = tryCatch(
+            { 
+                Sys.getenv(i)
+                temp = NA
+            }, 
+            error = function(x) {
+                info(paste0("Var not Found: ", x))
+                return(i)
+            }
+        )
+        n = c(n, temp)
+        #n = n + temp
+    }
+    n = unique(n)
+    temp = Sys.getenv(reqdArgs, unset = NA)
+    n = names(temp [ is.na(temp)])
+   #	message(n)
+    if(length(n) >= 1) {
+        notgiven = as.data.frame(helpVals [ ! helpVals[,2] %in% n, ])
+        given = helpVals [ helpVals[,2] %in% n, ]
+        
+        cat("Provide all the following options: \n")
+        cat("---------------------------------- \n")
+        formatHelp(reqFields, n)
+ #       quit(save="no", status=2)
+    }
+}
+

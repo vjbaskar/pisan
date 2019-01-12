@@ -17,7 +17,7 @@ ARGUMENTS
 -v|--qval) pvalue or q value cut off [0-1]
 -u|--conf) configuration file
 -y|--chrType) chromosome type [ucsc,ensembl]
--H|--nohistory) Do not add this command to pisan history. Go incognito!
+-H|--nohistory) Do not add this command to sanpi history. Go incognito!
 -P|--progArgs) arguments that can be passed to specific commands.
 
 + Farm specific options

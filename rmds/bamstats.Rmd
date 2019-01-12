@@ -1,0 +1,69 @@
+---
+title: "CRAM/BAM file statisitics"
+output: html_document
+editor_options: 
+chunk_output_type: inline
+---
+
+
+# Statistics for each file using samtools
+```{r loadingFiles}
+library(knitr)
+fileName=params$fileName
+wd=params$wd
+
+fileName=paste0(wd,"/",fileName)
+
+message("Loading files")
+getStats <- function(fileName){
+    stats = system(paste0("samtools flagstat ", fileName), intern = T)
+    stats
+    cnames = c("File","Total", "Secondary", "Supplementary", "Duplicates", "Mapped", "PairedInSequencing", "Read1", "Read2", "PairedInMapping","WithItselfAndMateMapped","Singletons","MateInDiffChrom","MateInDiffChom_mapqGT5")
+    x = sapply(stats, function(x) strsplit(x, " ")[[1]][1])
+    df = c(fileName, x)
+    df = t(as.data.frame(df))
+    colnames(df) <- cnames
+    return(df)
+}
+```
+
+# Files
+File name is `message(fileList)`
+```{r getFiles}
+#fileList <- list.files("./", "*.cram$")
+fileList <- as.character(read.table(fileName)$V1)
+fileList <- paste0(wd,"/",fileList)
+```
+
+# Get statistics
+```{r stats}
+setwd(wd)
+stats <- sapply(fileList, getStats)
+stats <- as.data.frame(t(stats))
+cnames = c("File","Total", "Secondary", "Supplementary", "Duplicates", "Mapped", "PairedInSequencing", "Read1", "Read2", "PairedInMapping","WithItselfAndMateMapped","Singletons","MateInDiffChrom","MateInDiffChom_mapqGT5")
+colnames(stats) <- cnames
+write.csv(stats, file=paste0(wd,"/alignstats.csv"), row.names = F)
+save.image(paste0(wd,"/bamstats.RData"))
+#stats
+```
+
+# Total aligned reads
+```{r echo = FALSE, message=FALSE, warning=FALSE}
+library(plotly)
+setwd(wd)
+stats = read.csv(paste0(wd,"/alignstats.csv"))
+stats$File <- sapply(stats$File, function(x) strsplit(basename(as.character(x)), "[.]")[[1]][1])
+
+p <- ggplot(stats) 
+t_up <- theme_bw() + theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
+theme_set(t_up)
+subplot(
+
+  ggplot(stats, aes(x = File, y = Total/100000), colour = File) + geom_bar(stat = "identity") ,
+    ggplot(stats, aes(x = File, y = Mapped/100000), colour = File) + geom_bar(stat = "identity"),
+	  nrows = 1, shareX = TRUE, shareY = TRUE,
+	    titleY = FALSE, titleX = FALSE
+		)
+p <- ggplot(stats, aes(x = File, y = Mapped/Total * 100), colour = File) + geom_bar(stat = "identity")
+ggplotly(p, tooltip="File")
+```

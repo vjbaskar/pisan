@@ -1,4 +1,6 @@
 d=`date +"%d/%m/%y %T"`
+legopipeID=`date +%Y-%m-%d-%H-%M-%S`
+legopipeID="legopipe.${legopipeID}.${RANDOM}"
 ## Functions for messaging to user
 sms(){
 	messaging=$1
@@ -12,7 +14,7 @@ sms_nonewline(){
 
 infosms(){
 	messaging=$1
-	echo "[ Info ] $messaging" > /dev/stderr
+	echo -e "\033[0;33m[ $d ] $messaging\033[0m" > /dev/stderr
 }
 
 warnsms(){
@@ -44,9 +46,36 @@ mandatory(){
 	done
 }
 
+commandsHelp(){
+    mainCommand=$commandName
+    grep "#@" $mainCommand | awk -F "#@" ' { command=gensub("\"|)","","g", $1) }  { print command, $2 } '   >&2
+    exit 0
+}
+
+copy_command(){
+	cmd=$1
+	d=`date +"%d_%m_%y_%T"`
+	c=`echo $cmd | awk ' { print $NF } '`
+	if [ ! -z $cwd/.legopipe ]; then
+		mkdir -p $cwd/.legopipe	
+	fi
+	temp=`basename $c`
+	cp $c $cwd/.legopipe/$legopipeID.$temp
+
+}
+
+toLower() {
+	echo "$1" | tr '[A-Z]' '[a-z]'
+}
+
+toUpper() {
+	echo "$1" | tr '[a-z]' '[A-Z]' 
+}
+
 
 export -f infosms
 export -f sms
 export -f warnsms
 export -f errorsms
 export -f sms_nonewline
+export legopipeID=$legopipeID

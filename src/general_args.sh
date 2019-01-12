@@ -24,31 +24,36 @@
 # G  = farm group
 # F = submit in farm or HPC
 
-
-
-source ~/.$USER/pisan.conf
+source $HOME/.legopipe/conf
 args_return=0
-print_help() {
+
+argsHelp() {
 	cat $mconf_installdir/cfgs/args
 	args_return=2
 }
 
-if [ $# -le 1 ]; then
-	print_help
-fi
+helpHandle=1
+if [ "$#" -eq "1" ]; then
+	argsHelp
+	helpHandle=0
+fi 
 
 if [ $# -le 4 ]; then
 	nohistory=1
+else
+	if [ $1 == "hist" ]; then
+		nohistory=1
+	fi
 fi
-
+	
 
 #set -o errexit -o noclobber -o nounset -o pipefail
 set -o errexit -o pipefail
-export pisanCommand="$@"
+export legopipeCommand="$@"
 
 
-SHORT="s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:O:a:W:T:j:G:P:FHw0:1:2:3:4:5:h"
-LONG="sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,inputFile:,title:,queue:,organism:,paired:,qval:,conf:,chrType:,command:,gtf:,outpt:,array:,walltime:,concurrent:,waitForJob:,farmgroup:,progArgs:,farm,nohistory,wait,cmd0:,cmd1:,cmd2:,cmd3:,cmd4:,cmd5:,help"
+SHORT="s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:O:a:W:T:j:G:P:FHwM0:1:2:3:4:5:h"
+LONG="sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,inputFile:,title:,queue:,organism:,paired:,qval:,conf:,chrType:,command:,gtf:,outpt:,array:,walltime:,concurrent:,waitForJob:,farmgroup:,progArgs:,farm,nohistory,wait,mailJob,cmd0:,cmd1:,cmd2:,cmd3:,cmd4:,cmd5:,help"
 #params="$(getopt -o s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:a:W:T:j:w1:2:3:4:5:h -l sampleFile:,id:,expType:,dataType:,comments:,procs:,mem:,conf:,title:,queue:,organism:,paired:,qval:,inputFile:,chrType:,command:,gtf:,array:,walltime:, concurrent:,waitForJob:,wait,file0:,file1:,file2:,file3:,file4:,file5:,help "$0" -- "$@")"
 params="$(getopt -o $SHORT -l $LONG --name "$0" -- "$@")"
 eval set -- "$params"
@@ -113,6 +118,8 @@ do
 		
 		-H|--nohistory) nohistory=1; shift;; # farm sub option
 		
+		-M|--mailJob) mailJob=1; shift;; # farm sub option to mail you when job is over
+		
 		-0|--cmd0) cmd0=$2; shift 2;;
 		
 		-1|--cmd1) cmd1=$2; shift 2;;
@@ -130,10 +137,14 @@ do
 			break
 		;;
 		-h|--help)
-			print_help; exit 2
+			if [ "$helpHandle" -gt 0 ]; then
+				argsHelp
+			fi ; 
+			commandsHelp $commandName ; 
+			exit 2
 		;;
 		?)
-			print_help; exit 2
+			commandsHelp $commandName ; exit 2
 		;;
 		*)
 			echo "Not implemented: $1" >&2
@@ -141,6 +152,8 @@ do
 		;;
 	esac
 done
+
+
 
 
 if [ -z "$queue" ]; then
@@ -165,6 +178,9 @@ fi
 if [ $nohistory -eq 0 ]; then
 	d=`date +%d/%m/%Y`
 	t=`date +%T`
-	echo "[ $d ] [ $t ] $pisanCommand" >> $HOME/.$USER/pisan/pisan.cmds
-	echo "[ $d ] [ $t ] $pisanCommand" >> .pisan.cmds
+	 if [ ! -z $cwd/.legopipe ]; then
+		         mkdir -p $cwd/.legopipe
+	fi
+	echo "[ $d ]	[ $t ]	[ $cwd ]	[ $legopipeID ]	$legopipeCommand" >> $HOME/.legopipe/hist.cmds
+	echo "[ $d ]	[ $t ]	[ $legopipeID ]	$legopipeCommand" >> $cwd/.legopipe/hist.cmds
 fi

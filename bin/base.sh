@@ -1,31 +1,33 @@
-# All args come from pisan command
+# All args come from sanpi command
 
 Help() { 
 echo -en "\033[31m"
 cat << EOM
+
+DESC:
+Uses BWA aligner to align reads. 
+Gives you sorted bam files.
+
 ++ Mandatory args: 
--t|--title
--c|--comments
--f|--inputFile
+-t|--title [project_Xmen]
+-c|--comments [bwa]
+-f|--inputFile [input file. see below]
+-F|--farm [no input]
+-m|--mem [20000]   # becomes bigger with bam file size
+-p|--procs [1]
+-r|--paired [0/1]
+-o|--organism ~/GENOMES/bwa/{genome_name}_bwa
 
-++ recommended: 
--F|--farm = flag
--m|--mem=20000   # becomes bigger with bam file size
--p|--procs=1
 
-organism options: hs,mm
+++ inputFile format
+2905STDY6551601 A1_DMSO1
+2905STDY6551602 A2_DMSO2
+2905STDY6551603 A3_DRUG1
+2905STDY6551605 A4_DRUG2
 
-***** inputFile format
-4010STDY7036819	C_3143NTA
-4010STDY7036820	C_3143NTB
-4010STDY7036821	C_3143NTC
-4010STDY7036822	C_3143CISWTA
-4010STDY7036823	C_3143CISWTB
-4010STDY7036824	C_3143CISWTC
-4010STDY7036825	C_3143CISMUTA
-4010STDY7036826	C_3143CISMUTB
-4010STDY7036827	C_3143CISMUTC
-	
+++ Packages used
+samtools, bwa
+
 EOM
 echo -en "\033[30m"
 }
@@ -45,6 +47,41 @@ fi
 
 
 # farm submission: commandfile var = commandFile
+# if [ ! -z "$farm" ]; then
+# 	export fileOfCommands=$commandFile
+# 	$mconf_installdir/bin/farmsub.sh
+# else 
+# 	warnsms "Not running as farm: Not recommended"
+# 	warnsms "$mconf_bashexec $commandFile"
+# fi
+
+
+#### Example batch run code block
+
+# commandFile="$title.bwa.cmds"
+# rm -f $commandFile
+# echo -n "" > $commandFile
+# while read line
+# do
+#         l=($line)
+#         id=${l[0]}
+#         name=${l[1]}
+# 
+#         if [ $paired -eq 1 ]; then
+#             echo "Running in paired end mode : $id"
+#             peAlign $id $name > $id.$name.bwa.sh
+#         else
+#             echo "Running in single end mode"
+#             seAlign $id $name > $id.$name.bwa.sh
+#         fi
+#         #sub_ncores normal bwa 20000 ${procs} $name "sh $id.$name.bwa.sh"
+#         echo "${mconf_bashexec} $id.$name.bwa.sh" >> $commandFile
+# 
+# done < <(grep -v "^#" $inputFile)
+# 
+# # commands
+# 
+# # farm submission: commandfile var = commandFile
 # if [ ! -z "$farm" ]; then
 # 	export fileOfCommands=$commandFile
 # 	$mconf_installdir/bin/farmsub.sh
