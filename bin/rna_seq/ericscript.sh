@@ -8,7 +8,7 @@ print_stderr "
 	t|title
 	c|comments
 	f|inputFile
-	0|file0 = database file in $mconf_ericscript_db in legopipe.conf
+	0|file0 = database file in $mconf_ericscript_db in pisan.conf
 	
 	++ recommended: 
 	F|farm

@@ -1,5 +1,5 @@
 mconf_bashexec="/bin/bash"
-mconf_installdir="/software/team163/VIJAY/SOFT/__pipeline/legopipe/"
+mconf_installdir="/software/team163/VIJAY/SOFT/__pipeline/pisan/"
 mconf_starindex="/lustre/scratch119/casm/team163gv/SHARED/reference/star/"
 mconf_salmonindex="/lustre/scratch119/casm/team163gv/SHARED/reference/salmon/"
 #mconf_Rscript="/software/R-3.3.0/bin/Rscript"

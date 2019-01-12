@@ -1,7 +1,7 @@
 #!/bin/sh
 
-name="kalki"
-new_name="legopipe"
+name="legopipe"
+new_name="pisan"
 mv bin/$name bin/$new_name
 list_of_files=`find . -name "*" -type f | grep -v git | grep -v $0 | grep -v _temp`
 for file in $list_of_files

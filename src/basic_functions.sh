@@ -1,6 +1,6 @@
 d=`date +"%d/%m/%y %T"`
-legopipeID=`date +%Y-%m-%d-%H-%M-%S`
-legopipeID="legopipe.${legopipeID}.${RANDOM}"
+pisanID=`date +%Y-%m-%d-%H-%M-%S`
+pisanID="pisan.${pisanID}.${RANDOM}"
 ## Functions for messaging to user
 sms(){
 	messaging=$1
@@ -56,11 +56,11 @@ copy_command(){
 	cmd=$1
 	d=`date +"%d_%m_%y_%T"`
 	c=`echo $cmd | awk ' { print $NF } '`
-	if [ ! -z $cwd/.legopipe ]; then
-		mkdir -p $cwd/.legopipe	
+	if [ ! -z $cwd/.pisan ]; then
+		mkdir -p $cwd/.pisan	
 	fi
 	temp=`basename $c`
-	cp $c $cwd/.legopipe/$legopipeID.$temp
+	cp $c $cwd/.pisan/$pisanID.$temp
 
 }
 
@@ -78,4 +78,4 @@ export -f sms
 export -f warnsms
 export -f errorsms
 export -f sms_nonewline
-export legopipeID=$legopipeID
+export pisanID=$pisanID

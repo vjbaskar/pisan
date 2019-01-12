@@ -1,7 +1,7 @@
 # Script: Main script
 
 # Main config file
-source ~/.$USER/pisan.conf
+source $HOME/.pisan/conf
 #! $mconf_bashexec
 
 #echo $args_return
@@ -15,103 +15,156 @@ cwd=`readlink -f $cwd`
 export cwd=$cwd	
 export pisanCommand="$@"
 
+export commandName=$(readlink -f `echo $0`)
+
 # export variables
 set -a # exports the variables as environment variables --> Useful for R scripts
-source $mconf_installdir/src/general_args.sh
 source $mconf_installdir/src/basic_functions.sh
+source $mconf_installdir/src/general_args.sh
+
 set +a # switch it back off
 
-pisan_help() 
-{
-cat "$mconf_installdir/cfgs/commands"
-exit 2
-}
+set -Eo pipefail
 
 if [ $# -eq 0 ] ; then
-	pisan_help
+	commandsHelp
 fi
 
+pisan_cmd=""
+
+#@ List of programs available
+#@ --------------------------
 
 case "$1" in
-# farm
-	"farmsub" )
-		source $mconf_installdir/bin/farmsub.sh ;;
-	"farmhist" )
-		$mconf_php $mconf_installdir/bin/farmhist.php ;;	
 
-# RNASeq
- 	"star" )
-	    source $mconf_installdir/bin/star.sh ;;
-	 "salmon" )
-	    source $mconf_installdir/bin/salmon.sh ;;
+#@ RNASeq
+ 	"star" ) #@ Run STAR aligner
+	    pisan_cmd="source $mconf_installdir/bin/rna_seq/star.sh" ;;
+	"salmon" ) #@ Run Salmon aligner 
+	    pisan_cmd="source $mconf_installdir/bin/rna_seq/salmon.sh" ;;
+	"countTableSTAR" ) #@ Generates gene count table from star aligner
+		pisan_cmd="source $mconf_installdir/bin/rna_seq/countTableSTAR.sh" ;;
+	"deseq2" ) #@ Run DESeq2
+		pisan_cmd="$mconf_Rscript $mconf_installdir/bin/rna_seq/deseq2.R" ;;
+	"countTableToTPM" ) #@ Converts count tables to RPKMs and TPMs
+		echo "$mconf_installdir/bin/rna_seq/fpkmTpm.R" ;
+		pisan_cmd="$mconf_Rscript $mconf_installdir/bin/rna_seq/fpkmTpm.R" ;;
 	
-	"countTableSTAR" )
-		source $mconf_installdir/bin/countTableSTAR.sh ;;
-	"deseq2" )
-		$mconf_Rscript $mconf_installdir/bin/deseq2.R ;;
-	"countTableToTPM" )
-		$mconf_Rscript $mconf_installdir/bin/countTableToTPM.R ;;
+ #@-Fusion
+	"ericscript" ) #@ EricScript
+		pisan_cmd="source $mconf_installdir/bin/rna_seq/ericscript.sh" ;;
+ #@-Splicing 
+	"miso" ) #@ Miso
+	    pisan_cmd="source $mconf_installdir/bin/rna_seq/miso.sh" ;;
+	"spladder" ) #@ Spladder
+	    pisan_cmd="source $mconf_installdir/bin/rna_seq/spladder.sh" ;;
 	
-	# Fusion
-		"ericscript" )
-			source $mconf_installdir/bin/ericscript.sh ;;
-			
-# Downloads
-	# iRODS
-	"irodsDownload" )
-		source $mconf_installdir/bin/irodsDownload.sh ;;
-	"irodsSampleInfo" )
-		source $mconf_installdir/bin/irodsSampleInfo.sh ;;
-	"createProject" )
-		$mconf_Rscript $mconf_installdir/bin/createProject.R ;;
-	"irodsMergeCramsToBam" )
-		source $mconf_installdir/bin/irodsMergeCramsToBam.sh ;;
+#@ Chipseq	
+	"macs2" ) #@ MACS2
+		pisan_cmd="source $mconf_installdir/bin/chipseq/macs2.sh" ;;
+	"homerCreateTagDir" ) #@ Create Homer tag directory from bam file
+		pisan_cmd="source $mconf_installdir/bin/chipseq/homerCreateTagDir.sh" ;;
+	"homerHistonePeaks" ) #@ Homer histone marks
+		pisan_cmd="source $mconf_installdir/bin/chipseq/homerHistonePeaks.sh" ;;
+	"bwa" ) #@ align using bwa
+		pisan_cmd="source $mconf_installdir/bin/chipseq/bwa.sh" ;;
+	"diffbind" ) #@ differential binding of peaks
+		pisan_cmd="source $mconf_installdir/bin/chipseq/diffbind.sh" ;;
+
+#@ CRISPR
+	"mageckCount" ) #@ count using MAGeCK
+		pisan_cmd="source $mconf_installdir/bin/crispr/mageckCount.sh" ;;
+	"mageckCompare" ) #@ compare using MAGeCK
+		pisan_cmd="source $mconf_installdir/bin/crispr/mageckCompare.sh" ;;	
+	"mageckXYsgRNA" ) #@ plot MAGeCK output
+		pisan_cmd="source $mconf_installdir/bin/crispr/mageckXYsgRNA.sh" ;;
+	"mageckTtest" ) #@ t-test using MAGeCK
+		pisan_cmd="$mconf_Rscript $mconf_installdir/bin/crispr/mageckTtest.R" ;;	
+	"crisprCounter" ) #@ Custom CRISPR counter
+		pisan_cmd="source $mconf_installdir/bin/crispr/crisprCounter.sh" ;;
+
+#@ RRBS-seq
+	"bismark" ) #@ Run bismark aligner
+		pisan_cmd="source $mconf_installdir/bin/methylseq/bismark.sh" ;;
+	"bismark_extractor" ) #@ Run bismark methylation extractor
+		pisan_cmd="source $mconf_installdir/bin/methylseq/bismark_extractor.sh" ;;
+	"methylKitPrelim" ) #@ Generates input files for methylKit from Bismark bam files
+		pisan_cmd="source $mconf_installdir/bin/methylseq/methylKitPrelim.sh" ;;
+
 	
-# Chipseq	
-	"macs2" )
-		source $mconf_installdir/bin/macs2.sh ;;
-	"homerCreateTagDir" )
-		source $mconf_installdir/bin/homerCreateTagDir.sh ;;
-	"homerHistonePeaks" )
-		source $mconf_installdir/bin/homerHistonePeaks.sh ;;
+#@ Farm 
+	"farmsub" ) #@ Submit to farm
+		pisan_cmd="source $mconf_installdir/bin/farmsub.sh" ;;
+	"farmhist" ) #@ Get history of farm jobs in that folder
+		pisan_cmd="$mconf_php $mconf_installdir/bin/farm/farmhist.php" ;;
+	"sendMail" ) #@ send email when farm job completes
+		source $mconf_installdir/bin/misc/sendMail.sh &   exit 0 ;;
 		
-# CRISPR
-	"mageckCount" )
-		source $mconf_installdir/bin/mageckCount.sh ;;
-	"mageckCompare" )
-		source $mconf_installdir/bin/mageckCompare.sh ;;	
-	"mageckXYsgRNA" )
-		source $mconf_installdir/bin/mageckXYsgRNA.sh ;;	
 
-# Procs
-	"bedGraphToBigWig" )
-		source $mconf_installdir/bin/bedGraphToBigWig.sh ;;
-	"bammerge" )
-		source $mconf_installdir/bin/bammerge.sh ;;
-	"bam2bw" )
-		source $mconf_installdir/bin/bam2bw.sh ;;
-	"bam2fq" )
-		source $mconf_installdir/bin/bam2fq.sh ;;
-	"filterCols" )
-		$mconf_Rscript $mconf_installdir/bin/filterCols.R ;;
-	"hist" )
-		source $mconf_installdir/bin/hist.sh ; export nohistory=1 ;;	
+			
+#@ Downloads
+ #@-iRODS
+	"irodsDownload" ) #@ Download from iRODs
+		pisan_cmd="source $mconf_installdir/bin/download/irodsDownload.sh" ;;
+	"irodsDownloadFromInfo" ) #@ Download from information file
+		pisan_cmd="source $mconf_installdir/bin/download/irodsDownloadFromInfo.sh" ;;
+	"irodsSampleInfo" ) #@ Get info for iRODs samples
+		pisan_cmd="source $mconf_installdir/bin/download/irodsSampleInfo.sh" ;;
+	"irodsRunInfo" ) #@ Get info for iRODs runs
+		pisan_cmd="source $mconf_installdir/bin/download/irodsRunInfo.sh" ;;
+	"createProject" )#@ Create project file from input csv/tsv
+		pisan_cmd="$mconf_Rscript $mconf_installdir/bin/download/createProject.R" ;;
+	"irodsInfo" ) #@ Get info for iRODs samples
+		pisan_cmd="source $mconf_installdir/bin/download/irodsInfo.sh" ;;
+	
+ #@-Public
+ 	"enaDownload" ) #@ Download data from ENA
+ 		pisan_cmd="source $mconf_installdir/bin/download/enaDownload.sh" ;;
 
-# Visualisation
-	"ucscCreateHub" )
-		source $mconf_installdir/bin/ucscCreateHub.sh ;;
+#@ Procs
+	"irodsMergeCramsToBam" ) #@ Merge cram files in folders to single bam
+		pisan_cmd="source $mconf_installdir/bin/procs/irodsMergeCramsToBam.sh" ;;
+	"sormadup" )  #@ sort sam, bam files
+		pisan_cmd="source $mconf_installdir/bin/procs/sormadup.sh" ;;
+	"bedGraphToBigWig" ) #@ bedgraph to bw
+		pisan_cmd="source $mconf_installdir/bin/procs/bedGraphToBigWig.sh" ;;
+	"bammerge" )  #@ merge bam files
+		pisan_cmd="source $mconf_installdir/bin/procs/bammerge.sh" ;;
+	"bam2bw" )  #@ bam to bw
+		pisan_cmd="source $mconf_installdir/bin/procs/bam2bw.sh" ;;
+	"bam2bdg" )  #@ bam to bedgraph
+		pisan_cmd="source $mconf_installdir/bin/procs/bam2bdg.sh" ;;
+	"bam2fq" )  #@ bam to fastq
+		pisan_cmd="source $mconf_installdir/bin/procs/bam2fq.sh" ;;
+	"cram2bam" )  #@ single cram to  single bam
+		pisan_cmd="source $mconf_installdir/bin/procs/cram2bam.sh" ;;
+	"cram2fastq" )  #@ cram to fastq
+		pisan_cmd="source $mconf_installdir/bin/procs/cram2fastq.sh" ;;
+	"filterCols" )  #@ filter columns from a csv or tsv file
+		pisan_cmd="$mconf_Rscript $mconf_installdir/bin/procs/filterCols.R" ;;
 
-# Set operations
-	"gsea" )
-		source $mconf_installdir/bin/gsea.sh ;;
+	
+#@ Stats	
+	"bamStatSortIndex" )  #@ bam stat, sort and index
+		pisan_cmd="source $mconf_installdir/bin/stats/bamStatSortIndex.sh" ;;
+	"gsea" ) #@ Gene Set Enrichment Analysis
+		pisan_cmd="source $mconf_installdir/bin/stats/gsea.sh" ;;
+	"hist" )  #@ history of the suite
+		export nohistory=1 ; 
+		pisan_cmd="source $mconf_installdir/bin/stats/hist.sh " ;;	
+
+#@ Visualisation
+	"ucscCreateHub" ) #@ create hub for upload to genome browser
+		pisan_cmd="source $mconf_installdir/bin/visualisation/ucscCreateHub.sh" ;;
 
 # Test tools
 	"test" )
-		source $mconf_installdir/bin/test.sh ;;
+		pisan_cmd="source $mconf_installdir/bin/test/test.sh" ;;
 	"testR" )
-		$mconf_Rscript $mconf_installdir/bin/test.R ;;
-
-
+		pisan_cmd="$mconf_Rscript $mconf_installdir/bin/test/test.R" ;;
+	*) 
+		warnsms "Provide a valid command"; commandsHelp  ;;
 esac
 
-
+$pisan_cmd
+copy_command "$pisan_cmd"

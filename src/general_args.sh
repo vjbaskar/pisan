@@ -24,7 +24,7 @@
 # G  = farm group
 # F = submit in farm or HPC
 
-source $HOME/.legopipe/conf
+source $HOME/.pisan/conf
 args_return=0
 
 argsHelp() {
@@ -49,7 +49,7 @@ fi
 
 #set -o errexit -o noclobber -o nounset -o pipefail
 set -o errexit -o pipefail
-export legopipeCommand="$@"
+export pisanCommand="$@"
 
 
 SHORT="s:i:e:d:c:p:m:f:t:q:o:r:v:u:y:x:g:O:a:W:T:j:G:P:FHwM0:1:2:3:4:5:h"
@@ -178,9 +178,9 @@ fi
 if [ $nohistory -eq 0 ]; then
 	d=`date +%d/%m/%Y`
 	t=`date +%T`
-	 if [ ! -z $cwd/.legopipe ]; then
-		         mkdir -p $cwd/.legopipe
+	 if [ ! -z $cwd/.pisan ]; then
+		         mkdir -p $cwd/.pisan
 	fi
-	echo "[ $d ]	[ $t ]	[ $cwd ]	[ $legopipeID ]	$legopipeCommand" >> $HOME/.legopipe/hist.cmds
-	echo "[ $d ]	[ $t ]	[ $legopipeID ]	$legopipeCommand" >> $cwd/.legopipe/hist.cmds
+	echo "[ $d ]	[ $t ]	[ $cwd ]	[ $pisanID ]	$pisanCommand" >> $HOME/.pisan/hist.cmds
+	echo "[ $d ]	[ $t ]	[ $pisanID ]	$pisanCommand" >> $cwd/.pisan/hist.cmds
 fi

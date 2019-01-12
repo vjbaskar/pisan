@@ -1,4 +1,4 @@
-# All args come from legopipe command
+# All args come from pisan command
 
 export nohistory=1 ; 
 Help() { 
@@ -14,17 +14,17 @@ cat << EOM
 
 ++ example:
 
-legopipe hist -P cat
-legopipe hist -P cat -c "Wed Apr 2"
+pisan hist -P cat
+pisan hist -P cat -c "Wed Apr 2"
 
 EOM
 echo -en "\033[30m"
 }
 
 if [ "$id" == "local" ]; then
-	legopipe_cmds="./.legopipe/hist.cmds"
+	pisan_cmds="./.pisan/hist.cmds"
 else
-	legopipe_cmds="$HOME/.legopipe/hist.cmds"
+	pisan_cmds="$HOME/.pisan/hist.cmds"
 fi
 
 
@@ -41,7 +41,7 @@ if [ `echo "$mandatory_fails" | wc -w` -gt 0 ]; then
 fi
 
 if [ ! -z "$comments" ]; then
-	grep "$comments" $legopipe_cmds
+	grep "$comments" $pisan_cmds
 else 
 	if [ "$progArgs" == "edit" ]; then
 		progArgs="vim"
@@ -49,5 +49,5 @@ else
 	if [ "$progArgs" == "grep" ]; then
 		progArgs="grep -i "
 	fi
-	$progArgs $legopipe_cmds
+	$progArgs $pisan_cmds
 fi

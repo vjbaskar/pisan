@@ -6,8 +6,8 @@ If you want to add other batch submission systems, then you have edit the <insta
 This is primarily written in linux bash. Some of these may be incompatible with Mac bash and needless to say Windows is out of question.
 It requires you to install all the command that it uses in its various sub commands.
 
-The main config file in <installdir> ~/.$USER/legopipe.conf
-If you provide a conf file with the commands it will overwrite options of legopipe.conf
+The main config file in <installdir> ~/.$USER/pisan.conf
+If you provide a conf file with the commands it will overwrite options of pisan.conf
 
 
 
@@ -17,7 +17,7 @@ If you provide a conf file with the commands it will overwrite options of legopi
 
 ## Main command
 
-legopipe 
+pisan 
 
 # Depends on
 All relevant tools should be added to your $PATH. The main ones are
@@ -34,7 +34,7 @@ All relevant tools should be added to your $PATH. The main ones are
 
 # How it works
 
-legopipe sources the main and local config files. Local config files overwrite main config
+pisan sources the main and local config files. Local config files overwrite main config
 
 It then reads in arguments from src/general_args.sh and functions from src/basic_functions.sh
 
